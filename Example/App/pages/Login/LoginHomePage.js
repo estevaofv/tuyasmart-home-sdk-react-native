@@ -1,17 +1,16 @@
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, Image, ImageBackground } from 'react-native'
-
-import ButtonX from '../../standard/components/buttonX'
+import React, { Component } from 'react';
+import {
+  View, StyleSheet, Text, Image, ImageBackground,
+} from 'react-native';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
 // import from '../../../node_modules/tuyasdk-react-native/src/index'
 
-// eslint-disable-next-line react/prefer-stateless-function
 export default class LoginHomePage extends Component {
   constructor(props) {
-    super(props)
-    console.log('login')
+    super(props);
   }
 
-  /* eslint-disable global-require */
   render() {
     return (
       <ImageBackground source={require('../../res/images/login_bg.png')} style={{ flex: 1 }}>
@@ -37,8 +36,8 @@ export default class LoginHomePage extends Component {
               justifyContent: 'center',
             }}
             onPress={() => {
-              console.warn('-')
-              this.props.navigation.navigate('RegisterPage')
+              console.warn('-');
+              this.props.navigation.navigate('RegisterPage');
             }}
           >
             <Text style={{ fontSize: 18, color: '#FFFFFF' }}>创建新账户</Text>
@@ -46,14 +45,14 @@ export default class LoginHomePage extends Component {
           <ButtonX
             style={{ marginTop: 20 }}
             onPress={() => {
-              this.props.navigation.navigate('LoginPage')
+              this.props.navigation.navigate('LoginPage');
             }}
           >
             <Text style={{ color: '#DBD7D5', fontSize: 16 }}>使用已有账户登陆</Text>
           </ButtonX>
         </View>
       </ImageBackground>
-    )
+    );
   }
 }
 
@@ -68,4 +67,4 @@ const styles = StyleSheet.create({
   tips: {
     fontSize: 29,
   },
-})
+});

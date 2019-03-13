@@ -1,16 +1,17 @@
-import React, { Component } from 'react'
-import { View, StyleSheet } from 'react-native'
-// import NavigationBar from "../../common/NavigationBar";
-// import ButtonX from "../../standard/components/buttonX";
+import React, { Component } from 'react';
+import {
+  View, StyleSheet, Text, Image, ImageBackground,
+} from 'react-native';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
 
 export default class ConfigSuccessPage extends Component {
   constructor(props) {
-    super(props)
-    console.warn('--->')
+    super(props);
   }
 
   render() {
-    return <View style={styles.container} />
+    return <View style={styles.container} />;
   }
 }
 
@@ -18,6 +19,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
+    backgroundColor: 'transparent',
     justifyContent: 'flex-start',
     alignItems: 'center',
     backgroundColor: 'black',
@@ -25,4 +27,4 @@ const styles = StyleSheet.create({
   tips: {
     fontSize: 29,
   },
-})
+});

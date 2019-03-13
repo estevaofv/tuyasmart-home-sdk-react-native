@@ -1,22 +1,23 @@
-/* eslint-disable */
-import React, { Component } from 'react'
-import { Text, View, StyleSheet, Dimensions } from 'react-native'
-import Picker from 'react-native-wheel-picker'
-import Toast from 'react-native-easy-toast'
-import { TuyaTimerApi } from 'tuyasmart-home-sdk'
-import Strings from '../../i18n'
-import ButtonX from '../../standard/components/buttonX'
-import NavigationBar from '../../common/NavigationBar'
-import ViewUtils from '../../utils/ViewUtils'
+import React, { Component } from 'react';
+import {
+  Text, View, StyleSheet, Dimensions,
+} from 'react-native';
+import Picker from 'react-native-wheel-picker';
+import Toast, { DURATION } from 'react-native-easy-toast';
+import Strings from '../../i18n';
+import ButtonX from '../../standard/components/buttonX';
+import NavigationBar from '../../common/NavigationBar';
+import ViewUtils from '../../utils/ViewUtils';
+import TuyaTimerApi from '../../api/TuyaTimerApi';
 
-const { height, width } = Dimensions.get('window')
-const PickerItem = Picker.Item
+const { height, width } = Dimensions.get('window');
+const PickerItem = Picker.Item;
 const Res = {
   // close: require('../res/timerclose.png'),
   // open: require('../res/timerOpen.png')
-}
-const WEEKS = ['S', 'M', 'T', 'W', 'Th', 'F', 'S']
-let hours = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+};
+const WEEKS = ['S', 'M', 'T', 'W', 'Th', 'F', 'S'];
+let hours = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
 let mins = [
   '00',
   '01',
@@ -45,7 +46,7 @@ let mins = [
   '24',
   '25',
   '26',
-]
+];
 
 // let mins = () => {
 //   let arr = new Array();
@@ -55,20 +56,20 @@ let mins = [
 //   console.log('-->arr',arr)
 //   return arr
 // };
-const time = ['AM', 'PM']
+const time = ['AM', 'PM'];
 
 export default class SchedulePage extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     // this.getHours();
     // this.getMins();
-    const s = this.props.navigation.state.params
-    d = s.data
-    console.log('-------s', d)
-    console.log('-------s devinfo', s.devInfo)
-    const mIndex = this.renderIndex(undefined != d ? d.m : '00', mins)
-    const hIndex = this.renderIndex(undefined != d ? d.h : '00', hours)
+    const s = this.props.navigation.state.params;
+    d = s.data;
+    console.log('-------s', d);
+    console.log('-------s devinfo', s.devInfo);
+    const mIndex = this.renderIndex(undefined != d ? d.m : '00', mins);
+    const hIndex = this.renderIndex(undefined != d ? d.h : '00', hours);
     // console.log({
     //   mIndex,
     //   hIndex,
@@ -91,34 +92,34 @@ export default class SchedulePage extends Component {
       isFirst: s.isFirst,
       category: s.category,
       ...d,
-    }
-    console.log('--->mmmm', this.state.m)
-    console.log('-->mings Index', mins.indexOf(this.state.m))
+    };
+    console.log('--->mmmm', this.state.m);
+    console.log('-->mings Index', mins.indexOf(this.state.m));
   }
 
   getHours() {
-    hours = []
+    hours = [];
     for (i = 1; i <= 12; i++) {
-      if (i < 10) hours.push({ label: `0${i}` })
-      else hours.push({ label: `${i}` })
+      if (i < 10) hours.push({ label: `0${i}` });
+      else hours.push({ label: `${i}` });
     }
   }
 
   getMins() {
-    mins = []
+    mins = [];
     for (i = 0; i < 60; i++) {
-      if (i < 10) mins.push({ label: `0${i}` })
-      else mins.push({ label: `${i}` })
+      if (i < 10) mins.push({ label: `0${i}` });
+      else mins.push({ label: `${i}` });
     }
   }
 
   renderIndex(key, valus) {
     for (let i = 0; i < valus.length; i++) {
       if (key == valus[i].label) {
-        return i
+        return i;
       }
     }
-    return 0
+    return 0;
   }
 
   render() {
@@ -127,7 +128,7 @@ export default class SchedulePage extends Component {
         <NavigationBar
           style={{ backgroundColor: '#F4F4F5', width }}
           leftButton={ViewUtils.getLeftButton(() => {
-            this.props.navigation.pop()
+            this.props.navigation.pop();
           })}
           title="创建定时"
         />
@@ -147,24 +148,24 @@ export default class SchedulePage extends Component {
             selectedValue={hours.indexOf(this.state.h)}
             itemStyle={{ color: 'black', fontSize: 20 }}
             onValueChange={(index) => {
-              console.log('h', index)
+              console.log('h', index);
               this.setState({
                 h: hours[index],
-              })
+              });
             }}
           >
             {hours.map((value, i) => <PickerItem label={value} value={i} key={value} />)}
           </Picker>
-          <Text style={{ fontSize: 18, color: '#868582', alignSelf: 'center' }}> : </Text>
+          <Text style={{ fontSize: 18, color: '#868582', alignSelf: 'center' }}>   :    </Text>
           <Picker
             style={{ width: 100, height: 220 }}
             selectedValue={mins.indexOf(this.state.m)}
             itemStyle={{ color: 'black', fontSize: 20 }}
             onValueChange={(index) => {
-              console.log('min', index)
+              console.log('min', index);
               this.setState({
                 m: mins[index],
-              })
+              });
             }}
           >
             {mins.map((value, i) => <PickerItem label={value} value={i} key={value} />)}
@@ -182,7 +183,7 @@ export default class SchedulePage extends Component {
             onValueChange={(index) => {
               this.setState({
                 time: time[index],
-              })
+              });
             }}
           >
             {time.map((value, i) => <PickerItem label={value} value={i} key={value} />)}
@@ -215,9 +216,9 @@ export default class SchedulePage extends Component {
               textStyle={d == '1' ? styles.selectText : {}}
               style={d == '1' ? styles.selectStyle : styles.norlmaStyle}
               onPress={() => {
-                const re = this.state.repeat
-                re[index] = d == '1' ? '0' : '1'
-                this.setState({ repeat: re })
+                const re = this.state.repeat;
+                re[index] = d == '1' ? '0' : '1';
+                this.setState({ repeat: re });
               }}
             />
           ))}
@@ -235,19 +236,17 @@ export default class SchedulePage extends Component {
             <ButtonX
               // image={Res.open}
               imageStyle={this.state.Power == 'open' ? { opacity: 1 } : { opacity: 0.5 }}
-              onPress={() =>
-                this.setState({
-                  Power: 'open',
-                })
+              onPress={() => this.setState({
+                Power: 'open',
+              })
               }
             />
             <ButtonX
               // image={Res.close}
               imageStyle={this.state.Power == 'close' ? { opacity: 1 } : { opacity: 0.5 }}
-              onPress={() =>
-                this.setState({
-                  Power: 'close',
-                })
+              onPress={() => this.setState({
+                Power: 'close',
+              })
               }
             />
           </View>
@@ -263,47 +262,47 @@ export default class SchedulePage extends Component {
           textStyle={{ color: 'white' }}
         />
       </View>
-    )
+    );
   }
 
   getTime() {
-    let h = this.state.h
-    const m = this.state.m
+    let h = this.state.h;
+    const m = this.state.m;
     if (this.state.time == 'PM') {
       if (parseInt(h) == 12) {
-        h = '00'
+        h = '00';
       } else {
-        h = parseInt(h) + 12
+        h = parseInt(h) + 12;
       }
     }
-    return `${h}:${m}`
+    return `${h}:${m}`;
   }
 
   save() {
-    const s = this.props.navigation.state.params
-    const d = this.getTime()
-    const instruct = []
-    instruct.push({ dps: { 0: true }, time: d })
-    const jsonstr = `${JSON.stringify(instruct)}`
-    console.log('---->instruct', jsonstr)
+    const s = this.props.navigation.state.params;
+    const d = this.getTime();
+    const instruct = [];
+    instruct.push({ dps: { 0: true }, time: d });
+    const jsonstr = `${JSON.stringify(instruct)}`;
+    console.log('---->instruct', jsonstr);
     if (this.state.isFirst) {
       TuyaTimerApi.addTimerWithTask({
-        taskName: 'timer',
+        taskName: 'timer22',
         loops: this.state.repeat.join(''),
         devId: this.state.devInfo.devId,
         dpId: '0',
         time: d,
       })
         .then((data) => {
-          console.log('--->data', data)
-          this.refs.toast.show('创建成功了')
-          this.props.navigation.pop()
+          console.log('--->data', data);
+          this.refs.toast.show('创建成功了');
+          this.props.navigation.pop();
         })
         .catch((err) => {
-          console.log('--->err', err)
-        })
+          console.log('--->err', err);
+        });
     } else {
-      console.log('--->this.state.category', this.state.category)
+      console.log('--->this.state.category', this.state.category);
       TuyaTimerApi.updateTimerWithTaskInstruct({
         taskName: 'timer',
         loops: this.state.repeat.join(''),
@@ -312,12 +311,12 @@ export default class SchedulePage extends Component {
         instruct: jsonstr,
       })
         .then((data) => {
-          console.log('--->data', data)
-          this.props.navigation.pop()
+          console.log('--->data', data);
+          this.props.navigation.pop();
         })
         .catch((err) => {
-          console.log('---->err', err)
-        })
+          console.log('---->err', err);
+        });
     }
   }
 }
@@ -376,4 +375,4 @@ const styles = StyleSheet.create({
     borderColor: '#7DB428',
     borderWidth: 1,
   },
-})
+});

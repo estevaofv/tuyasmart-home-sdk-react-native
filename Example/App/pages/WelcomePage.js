@@ -1,59 +1,64 @@
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, Platform } from 'react-native'
-import { TuyaCoreApi } from 'tuyasmart-home-sdk'
-import { StackActions, NavigationActions } from 'react-navigation'
-import NavigationBar from '../common/NavigationBar'
-import DeviceStorage from '../utils/DeviceStorage'
+import React, { Component } from 'react';
+import {
+  View, StyleSheet, Text, Platform,
+} from 'react-native';
+import { StackNavigator, StackActions, NavigationActions } from 'react-navigation';
+import NavigationBar from '../common/NavigationBar';
+import TuyaCoreApi from '../api/TuyaCoreApi';
+import DeviceStorage from '../utils/DeviceStorage';
 
-const TIME = 2000
+const TIME = 2000;
 const resetAction = StackActions.reset({
   index: 0,
   actions: [
     NavigationActions.navigate({ routeName: 'HomePage' }), // 要跳转到的页面名字
   ],
-})
+});
 const resetActionLogin = StackActions.reset({
   index: 0,
   actions: [
     NavigationActions.navigate({ routeName: 'LoginHomePage' }), // 要跳转到的页面名字
   ],
-})
+});
 
 // import HomePage from './HomePage'
 
 export default class WelcomePage extends Component {
   constructor(props) {
-    super(props)
-    if (Platform.OS === 'ios') {
-      // TuyaCore.initApp({ appKey: AppKeyIos, appSecret: AppSecretIos })
+    super(props);
+    if (Platform.OS == 'ios') {
+      TuyaCoreApi.initWithOptions({
+        appKey: 'tvy48uw4vqk9pte3cxcv',
+        appSecret: '9vvxwrm5q3updnccvujjmxk9sjphrmhv',
+      });
     } else {
       TuyaCoreApi.initWithOptions({
-        appKey: 'utk3ttkpcx87xr4h7r5f',
-        appSecret: 'ecvr9tn3apnk5j5eyug4gx5hssx4pek5',
-      })
+        appKey: 'tvy48uw4vqk9pte3cxcv',
+        appSecret: '9vvxwrm5q3updnccvujjmxk9sjphrmhv',
+      });
     }
   }
 
   componentDidMount() {
     DeviceStorage.getUserInfo()
       .then((data) => {
-        console.log('DeviceStorage.getUserInfo', data)
+        console.log('DeviceStorage.getUserInfo', data);
         if (data != null) {
-          console.log('data1', data)
-          this.props.navigation.dispatch(resetAction)
+          console.log('data1', data);
+          this.props.navigation.dispatch(resetAction);
         } else {
-          console.log('data2', data)
+          console.log('data2', data);
           this.timer = setTimeout(() => {
-            this.props.navigation.dispatch(resetActionLogin)
-          }, TIME)
+            this.props.navigation.dispatch(resetActionLogin);
+          }, TIME);
         }
       })
       .catch((error) => {
-        console.log('DeviceStorage.getUserInfo', error)
+        console.log('DeviceStorage.getUserInfo', error);
         this.timer = setTimeout(() => {
-          this.props.navigation.dispatch(resetActionLogin)
-        }, TIME)
-      })
+          this.props.navigation.dispatch(resetActionLogin);
+        }, TIME);
+      });
 
     // this.timer=setTimeout(()=> {
     //    this.props.navigation.navigate('HomePage');
@@ -61,9 +66,7 @@ export default class WelcomePage extends Component {
   }
 
   componentWillUnmount() {
-    if (this.timer) {
-      clearTimeout(this.timer)
-    }
+    this.timer && clearTimeout(this.timer);
   }
 
   render() {
@@ -72,7 +75,7 @@ export default class WelcomePage extends Component {
         <NavigationBar title="欢迎" style={{ backgroundColor: '#6495ED' }} />
         <Text style={styles.tips}>欢迎</Text>
       </View>
-    )
+    );
   }
 }
 const styles = StyleSheet.create({
@@ -82,4 +85,4 @@ const styles = StyleSheet.create({
   tips: {
     fontSize: 29,
   },
-})
+});

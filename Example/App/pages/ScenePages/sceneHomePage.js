@@ -1,32 +1,34 @@
-import React, { Component } from 'react'
-import { View, Text, Image, Dimensions, TouchableOpacity, BackHandler } from 'react-native'
-// import NavigationBar from '../../common/NavigationBar';
-// import ButtonX from '../../standard/components/buttonX';
-// import { resetAction } from '../../navigations/AppNavigator';
-// import DeviceStorage from '../../utils/DeviceStorage';
-// import TextButton from '../../component/TextButton';
+import React, { Component } from 'react';
+import {
+  View, StyleSheet, Text, Image, ImageBackground, Dimensions, TouchableOpacity, BackHandler,
+} from 'react-native';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
+import { resetAction } from '../../navigations/AppNavigator';
+import TuyaUserApi from '../../api/TuyaUserApi';
+import DeviceStorage from '../../utils/DeviceStorage';
+import TextButton from '../../component/TextButton';
 
-const { width } = Dimensions.get('window')
-/* eslint-disable global-require */
+const { height, width } = Dimensions.get('window');
 const Res = {
   enterScene: require('../../res/images/enterCondition.png'),
   enterCondition: require('../../res/images/enterScene.png'),
   Arrow_right: require('../../res/images/Arrow_right.png'),
   exit: require('../../res/images/exit.png'),
-}
+};
 
 export default class sceneHomePage extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
-    this.state = {}
+    this.state = {};
   }
 
   componentDidMount() {
     BackHandler.addEventListener('hardwareBackPress', () => {
-      this.props.navigation.pop()
-      return true
-    })
+      this.props.navigation.pop();
+      return true;
+    });
   }
 
   render() {
@@ -56,7 +58,7 @@ export default class sceneHomePage extends Component {
             this.props.navigation.navigate('AddScenePage', {
               item: {},
               isEdit: false,
-            })
+            });
           }}
         >
           <View
@@ -98,7 +100,7 @@ export default class sceneHomePage extends Component {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            this.props.navigation.navigate('AddAutoPage')
+            this.props.navigation.navigate('AddAutoPage');
           }}
         >
           <View
@@ -141,12 +143,12 @@ export default class sceneHomePage extends Component {
         <TouchableOpacity
           style={{ marginTop: 30 }}
           onPress={() => {
-            this.props.navigation.pop()
+            this.props.navigation.pop();
           }}
         >
           <Image source={Res.exit} style={{ resizeMode: 'stretch' }} />
         </TouchableOpacity>
       </View>
-    )
+    );
   }
 }

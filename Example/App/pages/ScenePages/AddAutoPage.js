@@ -1,14 +1,27 @@
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, Image, Dimensions, TouchableOpacity, SwipeableFlatList } from 'react-native'
-import { connect } from 'react-redux'
-import { TuyaSceneApi } from 'tuyasmart-home-sdk'
-import NavigationBar from '../../common/NavigationBar'
-import DeviceStorage from '../../utils/DeviceStorage'
-import Strings from '../../i18n'
-import EditDialog from '../../component/EditDialog'
+import React, { Component } from 'react';
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  ImageBackground,
+  Dimensions,
+  TouchableOpacity,
+  Switch,
+  FlatList,
+  SwipeableFlatList,
+} from 'react-native';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
+import { resetAction } from '../../navigations/AppNavigator';
+import TuyaUserApi from '../../api/TuyaUserApi';
+import DeviceStorage from '../../utils/DeviceStorage';
+import TextButton from '../../component/TextButton';
+import Strings from '../../i18n';
+import TuyaSceneApi from '../../api/TuyaSceneApi';
+import EditDialog from '../../component/EditDialog';
 
-const { width } = Dimensions.get('window')
-/* eslint-disable global-require */
+const { height, width } = Dimensions.get('window');
 const Res = {
   scenebg: require('../../res/images/scenebg.png'),
   redAdd: require('../../res/images/red_add.png'),
@@ -17,76 +30,154 @@ const Res = {
   cloud: require('../../res/images/cloud.png'),
   humidity: require('../../res/images/humidity.png'),
   sunsetrise: require('../../res/images/sunsetrise.png'),
-}
+};
 
-class AddAutoPage extends Component {
+export default class AddAutoPage extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
+      onTop: true,
       ActionList: [],
       editVisible: false,
       nameValue: '',
       name: '编辑名称',
       ConditionList: [],
-      homeId: this.props.reducers.homeId,
-    }
+    };
   }
 
   componentWillMount() {
-    console.log('addAuto', this.state.homeId)
     DeviceStorage.get('Action')
       .then((data) => {
         this.setState({
           ActionList: data,
-        })
+        });
       })
       .catch((err) => {
-        console.log('--->Err', err)
-      })
+        console.log('--->Err', err);
+      });
     DeviceStorage.get('Condition')
       .then((data) => {
-        console.log('-->device condition', data)
+        console.log('-->device condition', data);
         this.setState({
           ConditionList: data,
-        })
+        });
       })
       .catch((err) => {
-        console.log('--->Err', err)
-      })
+        console.log('--->Err', err);
+      });
   }
 
-  // 侧滑菜单渲染
-  getQuickActions = (item) => (
-    <View style={styles.quickAContent}>
+  renderLeftButton(name) {
+    return (
       <TouchableOpacity
-        activeOpacity={1}
         onPress={() => {
-          const newArr = []
-          const data = this.state.ActionList
-          for (let i = 0, j = data.length; i < j; i++) {
-            if (data[i].dpId !== item.dpId) {
-              newArr.push(data[i].dpId)
-            }
-          }
+          DeviceStorage.delete('Action');
+          DeviceStorage.delete('Condition');
           this.setState({
-            ActionList: newArr,
-          })
-          DeviceStorage.save('Action', newArr)
+            ActionList: [],
+            ConditionList: [],
+          });
+          this.props.navigation.navigate('HomePage');
         }}
       >
-        <View style={styles.quick}>
-          <Text style={styles.delete}>{Strings.delete}</Text>
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: 'bold',
+            color: 'black',
+            marginLeft: 15,
+          }}
+        >
+          {name}
+        </Text>
+      </TouchableOpacity>
+    );
+  }
+
+  renderRightButton(name) {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          console.log('---->this.state', this.state.ConditionList);
+          console.log('--this.stateddd', this.state.ActionList);
+          if (this.state.ActionList.length > 0) {
+            const ActionLists = this.state.ActionList;
+            const devLists = new Array();
+            const conditionList = this.state.ConditionList;
+            for (let i = 0, j = ActionLists.length; i < j; i++) {
+              devLists.push(ActionLists[i].devId);
+            }
+            TuyaSceneApi.createAutoScene({
+              homeId: 2040920,
+              name: this.state.name,
+              stickyOnTop: false,
+              devIds: devLists,
+              background: 'https://images.tuyacn.com/smart/rule/cover/bedroom.png',
+              matchType: 'MATCH_TYPE_OR',
+              tasks: ActionLists,
+              conditionList: this.state.ConditionList,
+            })
+              .then((data) => {
+                console.log('--->data', data);
+                DeviceStorage.delete('Action');
+                DeviceStorage.delete('Condition');
+                this.setState({
+                  ActionList: [],
+                  ConditionList: [],
+                });
+                this.props.navigation.navigate('HomePage');
+              })
+              .catch((err) => {
+                console.log('-->err', err);
+              });
+          } else {
+            // 未添加动作
+          }
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: 'bold',
+            color: 'black',
+            marginRight: 15,
+          }}
+        >
+          {name}
+        </Text>
+      </TouchableOpacity>
+    );
+  }
+
+  _renderFooter() {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          this.props.navigation.navigate('AddActionPage', {
+            isFromScene: false,
+          });
+        }}
+      >
+        <View
+          style={{
+            width,
+            height: 60,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ color: '#A2A3AA', fontSize: 13 }}>添加执行动作</Text>
         </View>
       </TouchableOpacity>
-    </View>
-  )
+    );
+  }
 
   _renderConditionFooter() {
     return (
       <TouchableOpacity
         onPress={() => {
-          this.props.navigation.navigate('ConditionListPage')
+          this.props.navigation.navigate('ConditionListPage');
         }}
       >
         <View
@@ -100,7 +191,7 @@ class AddAutoPage extends Component {
           <Text style={{ color: '#A2A3AA', fontSize: 13 }}>添加执行条件</Text>
         </View>
       </TouchableOpacity>
-    )
+    );
   }
 
   _renderItem(data) {
@@ -109,7 +200,7 @@ class AddAutoPage extends Component {
         activeOpacity={1}
         style={styles.itemStyle}
         onPress={() => {
-          console.log('--->data.item', data.item)
+          console.log('--->data.item', data.item);
         }}
       >
         <Image style={{ height: 35, width: 35 }} source={Res.picTake} />
@@ -134,16 +225,25 @@ class AddAutoPage extends Component {
           {`${data.item.value}`}
         </Text>
       </TouchableOpacity>
-    )
+    );
   }
 
   _renderConditionItem(data) {
+    console.log('----->_renderConditionItem', data);
+    let text = '';
+    if (data.item.type == 'temp') {
+      text = `${data.item.range} ` + ':' + ` ${data.item.rule}`;
+      console.log('---->data.range', data.item.range);
+    } else {
+      console.log('---->data.rule', data.item.rule);
+      text = data.item.rule;
+    }
     return (
       <TouchableOpacity
         activeOpacity={1}
         style={styles.itemConditionStyle}
         onPress={() => {
-          console.log('--->data.item', data.item)
+          console.log('--->data.item', data.item);
         }}
       >
         <Image style={{ height: 20, width: 20, resizeMode: 'stretch' }} source={Res.cloud} />
@@ -172,117 +272,38 @@ class AddAutoPage extends Component {
               flex: 1,
             }}
           >
-            {`${data.item.enumRule}`}
+            {text}
           </Text>
         </View>
       </TouchableOpacity>
-    )
+    );
   }
 
-  _renderFooter() {
-    return (
+  // 侧滑菜单渲染
+  getQuickActions = item => (
+    <View style={styles.quickAContent}>
       <TouchableOpacity
+        activeOpacity={1}
         onPress={() => {
-          this.props.navigation.navigate('AddActionPage', {
-            isFromScene: false,
-          })
+          const newArr = new Array();
+          const data = this.state.ActionList;
+          for (let i = 0, j = data.length; i < j; i++) {
+            if (data[i].dpId !== item.dpId) {
+              newArr.push(data[i].dpId);
+            }
+          }
+          this.setState({
+            ActionList: newArr,
+          });
+          DeviceStorage.save('Action', newArr);
         }}
       >
-        <View
-          style={{
-            width,
-            height: 60,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text style={{ color: '#A2A3AA', fontSize: 13 }}>添加执行动作</Text>
+        <View style={styles.quick}>
+          <Text style={styles.delete}>{Strings.delete}</Text>
         </View>
       </TouchableOpacity>
-    )
-  }
-
-  renderRightButton(name) {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          console.log('--this.stateddd', this.state.ActionList)
-          if (this.state.ActionList.length > 0) {
-            const ActionLists = this.state.ActionList
-            const devLists = []
-            const conditionList = this.state.ConditionList
-            console.log('---->this.state', conditionList)
-            for (let i = 0, j = ActionLists.length; i < j; i++) {
-              devLists.push(ActionLists[i].devId)
-            }
-            TuyaSceneApi.createAutoScene({
-              homeId: this.state.homeId,
-              name: this.state.name,
-              stickyOnTop: false,
-              devIds: devLists,
-              background: 'a',
-              matchType: 'MATCH_TYPE_OR',
-              tasks: ActionLists,
-              conditionList: this.state.ConditionList,
-            })
-              .then((data) => {
-                console.log('--->data', data)
-                DeviceStorage.delete('Action')
-                DeviceStorage.delete('Condition')
-                this.setState({
-                  ActionList: [],
-                  ConditionList: [],
-                })
-                this.props.navigation.navigate('HomePage')
-              })
-              .catch((err) => {
-                console.log('-->err', err)
-              })
-          } else {
-            // 未添加动作
-          }
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 14,
-            fontWeight: 'bold',
-            color: 'black',
-            marginRight: 15,
-          }}
-        >
-          {name}
-        </Text>
-      </TouchableOpacity>
-    )
-  }
-
-  renderLeftButton(name) {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          DeviceStorage.delete('Action')
-          DeviceStorage.delete('Condition')
-          this.setState({
-            ActionList: [],
-            ConditionList: [],
-          })
-          this.props.navigation.navigate('HomePage')
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 14,
-            fontWeight: 'bold',
-            color: 'black',
-            marginLeft: 15,
-          }}
-        >
-          {name}
-        </Text>
-      </TouchableOpacity>
-    )
-  }
+    </View>
+  )
 
   render() {
     return (
@@ -323,7 +344,7 @@ class AddAutoPage extends Component {
             onPress={() => {
               this.setState({
                 editVisible: true,
-              })
+              });
             }}
           >
             <Text
@@ -359,7 +380,7 @@ class AddAutoPage extends Component {
                 justifyContent: 'center',
               }}
               onPress={() => {
-                this.props.navigation.navigate('ConditionListPage')
+                this.props.navigation.navigate('ConditionListPage');
               }}
             >
               <Text style={{ fontSize: 16, color: '#FFFFFF' }}>+</Text>
@@ -368,7 +389,7 @@ class AddAutoPage extends Component {
           <SwipeableFlatList
             data={this.state.ConditionList}
             ref={(ref) => {
-              this._flatListRef = ref
+              this._flatListRef = ref;
             }}
             renderItem={this._renderConditionItem}
             style={{ width }}
@@ -412,7 +433,7 @@ class AddAutoPage extends Component {
               onPress={() => {
                 this.props.navigation.navigate('AddActionPage', {
                   isFromScene: false,
-                })
+                });
               }}
             >
               <Text style={{ fontSize: 16, color: '#FFFFFF' }}>+</Text>
@@ -421,7 +442,7 @@ class AddAutoPage extends Component {
           <SwipeableFlatList
             data={this.state.ActionList}
             ref={(ref) => {
-              this._flatListRef = ref
+              this._flatListRef = ref;
             }}
             renderItem={this._renderItem}
             style={{ width }}
@@ -437,22 +458,22 @@ class AddAutoPage extends Component {
           textValue={(value) => {
             this.setState({
               nameValue: value,
-            })
+            });
           }}
           save={() => {
             this.setState({
               name: this.state.nameValue,
               editVisible: false,
-            })
+            });
           }}
           cancel={() => {
             this.setState({
               editVisible: false,
-            })
+            });
           }}
         />
       </View>
-    )
+    );
   }
 }
 
@@ -495,7 +516,4 @@ const styles = StyleSheet.create({
     width,
     backgroundColor: '#FFFFFF',
   },
-})
-export default connect((state) => ({
-  ...state,
-}))(AddAutoPage)
+});

@@ -1,17 +1,28 @@
-import React, { Component } from 'react'
-import { Text, View, FlatList, Image, TouchableOpacity, Dimensions, DeviceEventEmitter } from 'react-native'
-import Toast, { DURATION } from 'react-native-easy-toast'
-import Picker from 'react-native-wheel-picker'
-import ViewUtils from '../../utils/ViewUtils'
-import { resetAction } from '../../navigations/AppNavigator'
-import NavigationBar from '../../common/NavigationBar'
-import DeviceStorage from '../../utils/DeviceStorage'
-import { conditionSettingConfig } from '../../config'
+import React, { Component } from 'react';
+import {
+  Text,
+  ScrollView,
+  View,
+  FlatList,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  DeviceEventEmitter,
+  Platform,
+  Modal,
+} from 'react-native';
+import Toast, { DURATION } from 'react-native-easy-toast';
+import Picker from 'react-native-wheel-picker';
+import ViewUtils from '../../utils/ViewUtils';
+import { resetAction } from '../../navigations/AppNavigator';
+import NavigationBar from '../../common/NavigationBar';
+import DeviceStorage from '../../utils/DeviceStorage';
+import { conditionSettingConfig } from '../../config';
 
-const { width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window');
 
-const PickerItem = Picker.Item
-/* eslint-disable global-require */
+const PickerItem = Picker.Item;
 const Res = {
   enterScene: require('../../res/images/enterCondition.png'),
   enterCondition: require('../../res/images/enterScene.png'),
@@ -19,8 +30,8 @@ const Res = {
   arrowRight: require('../../res/images/Arrow_right.png'),
   currentKey: require('../../res/images/currentKey.png'),
   cloud: require('../../res/images/cloud.png'),
-}
-const SYMBOL = ['>', '==', '<']
+};
+const SYMBOL = ['>', '==', '<'];
 const temperatureDatas = [
   '0',
   '1',
@@ -41,21 +52,21 @@ const temperatureDatas = [
   '16',
   '17',
   '18',
-]
+];
 
 export default class ConditionPage extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
-    const params = this.props.navigation.state.params
-    console.log('--->params', params)
-    let config = []
+    const params = this.props.navigation.state.params;
+    console.log('--->params', params);
+    let config = new Array();
     if (params.item.type === 'humidity') {
-      config = conditionSettingConfig.humidity // 湿度
+      config = conditionSettingConfig.humidity; // 湿度
     } else if (params.item.type === 'condition') {
-      config = conditionSettingConfig.condition // 天气
+      config = conditionSettingConfig.condition; // 天气
     } else if (params.item.type === 'sunsetrise') {
-      config = conditionSettingConfig.sunsetrise // 日落日出
+      config = conditionSettingConfig.sunsetrise; // 日落日出
     }
 
     this.state = {
@@ -68,10 +79,10 @@ export default class ConditionPage extends Component {
       placeBean: '',
       selectedItem: 0,
       symbolList: ['大于', '等于', '小于'],
-      // currentSymbolValue: SYMBOL[0],
+      currentSymbolValue: SYMBOL[0],
       currentTempValue: '5',
       range: '>',
-    }
+    };
   }
 
   // initDatas () {
@@ -84,12 +95,12 @@ export default class ConditionPage extends Component {
 
   componentDidMount() {
     this.chooseCityListener = DeviceEventEmitter.addListener('chooseCity', (value) => {
-      console.warn('--->value', value)
+      console.warn('--->value', value);
       this.setState({
         localCity: value.item.city,
         placeBean: value.item,
-      })
-    })
+      });
+    });
   }
 
   getRightButton() {
@@ -103,12 +114,12 @@ export default class ConditionPage extends Component {
         }}
         onPress={() => {
           if (this.state.localCity.length !== 0) {
-            if (this.state.type === 'humidity' || this.state.type === 'condition' || this.state.type === 'sunsetrise') {
+            if (this.state.type == 'humidity' || this.state.type == 'condition' || this.state.type == 'sunsetrise') {
               DeviceStorage.get('Condition').then((data) => {
-                const arr = []
-                if (data !== undefined) {
+                const arr = new Array();
+                if (data != undefined) {
                   for (let i = 0, j = data.length; i < j; i++) {
-                    arr.push(data[i])
+                    arr.push(data[i]);
                   }
                   arr.push({
                     type: this.state.type,
@@ -116,9 +127,10 @@ export default class ConditionPage extends Component {
                     rule: this.state.currentValue,
                     localCity: this.state.localCity,
                     placeBean: this.state.placeBean,
-                  })
-                  DeviceStorage.save('Condition', arr)
-                  this.props.navigation.dispatch(resetAction('AddAutoPage'))
+                    entityType: 3, // 创建天气类型需要 6，设备传1,定时传3
+                  });
+                  DeviceStorage.save('Condition', arr);
+                  this.props.navigation.dispatch(resetAction('AddAutoPage'));
                 } else {
                   arr.push({
                     type: this.state.type,
@@ -126,17 +138,18 @@ export default class ConditionPage extends Component {
                     rule: this.state.currentValue,
                     localCity: this.state.localCity,
                     placeBean: this.state.placeBean,
-                  })
-                  DeviceStorage.save('Condition', arr)
-                  this.props.navigation.dispatch(resetAction('AddAutoPage'))
+                    entityType: 3, // 创建天气类型需要 6，设备传1,定时传3
+                  });
+                  DeviceStorage.save('Condition', arr);
+                  this.props.navigation.dispatch(resetAction('AddAutoPage'));
                 }
-              })
+              });
             } else {
               DeviceStorage.get('Condition').then((data) => {
-                const arr = []
-                if (data !== undefined) {
+                const arr = new Array();
+                if (data != undefined) {
                   for (let i = 0, j = data.length; i < j; i++) {
-                    arr.push(data[i])
+                    arr.push(data[i]);
                   }
                   arr.push({
                     type: this.state.type,
@@ -145,9 +158,10 @@ export default class ConditionPage extends Component {
                     localCity: this.state.localCity,
                     placeBean: this.state.placeBean,
                     range: this.state.range,
-                  })
-                  DeviceStorage.save('Condition', arr)
-                  this.props.navigation.dispatch(resetAction('AddAutoPage'))
+                    entityType: 3, // 创建天气类型需要 6，设备传1,定时传3
+                  });
+                  DeviceStorage.save('Condition', arr);
+                  this.props.navigation.dispatch(resetAction('AddAutoPage'));
                 } else {
                   arr.push({
                     type: this.state.type,
@@ -156,56 +170,56 @@ export default class ConditionPage extends Component {
                     localCity: this.state.localCity,
                     placeBean: this.state.placeBean,
                     range: this.state.range,
-                  })
-                  DeviceStorage.save('Condition', arr)
-                  this.props.navigation.dispatch(resetAction('AddAutoPage'))
+                    entityType: 3, // 创建天气类型需要 6，设备传1,定时传3
+                  });
+                  DeviceStorage.save('Condition', arr);
+                  this.props.navigation.dispatch(resetAction('AddAutoPage'));
                 }
-              })
+              });
             }
           } else {
-            this.toast.show('城市还没选(^_^)', DURATION.LENGTH_LONG)
+            this.toast.show('城市还没选(^_^)', DURATION.LENGTH_LONG);
           }
         }}
       >
         <Text style={{ color: 'black', fontSize: 16, marginRight: 10 }}>下一步</Text>
       </TouchableOpacity>
-    )
+    );
   }
 
   render() {
-    const list =
-      this.state.type === 'humidity' || this.state.type === 'condition' || this.state.type === 'sunsetrise' ? (
-        <FlatList
-          data={this.state.conditionData}
-          style={{ width, marginTop: 40 }}
-          renderItem={({ item, index }) => {
-            console.log('--->item', item)
-            console.log('---indx', index)
-            return (
-              <TouchableOpacity
-                onPress={() => {
-                  console.log('--->data', item)
-                  this.setState({
-                    currentIndex: index,
-                    currentValue: item.key,
-                  })
-                }}
-                style={{
-                  width,
-                  height: 50,
-                  backgroundColor: '#FFFFFF',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <Text style={{ color: 'black', fontSize: 14, marginLeft: 20 }}>{item.label}</Text>
-                {this.state.currentIndex === index && <Image source={Res.currentKey} style={{ marginRight: 20 }} />}
-              </TouchableOpacity>
-            )
-          }}
-        />
-      ) : null
+    const list = this.state.type === 'humidity' || this.state.type === 'condition' || this.state.type === 'sunsetrise' ? (
+      <FlatList
+        data={this.state.conditionData}
+        style={{ width, marginTop: 40 }}
+        renderItem={({ item, index }) => {
+          console.log('--->item', item);
+          console.log('---indx', index);
+          return (
+            <TouchableOpacity
+              onPress={() => {
+                console.log('--->data', item);
+                this.setState({
+                  currentIndex: index,
+                  currentValue: item.key,
+                });
+              }}
+              style={{
+                width,
+                height: 50,
+                backgroundColor: '#FFFFFF',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ color: 'black', fontSize: 14, marginLeft: 20 }}>{item.label}</Text>
+              {this.state.currentIndex === index && <Image source={Res.currentKey} style={{ marginRight: 20 }} />}
+            </TouchableOpacity>
+          );
+        }}
+      />
+    ) : null;
     return (
       <View
         style={{
@@ -219,14 +233,14 @@ export default class ConditionPage extends Component {
         <NavigationBar
           style={{ backgroundColor: '#F4F4F5', width }}
           leftButton={ViewUtils.getLeftButton(() => {
-            this.props.navigation.pop()
+            this.props.navigation.pop();
           })}
           rightButton={this.getRightButton(this.props)}
           title={this.state.title}
         />
         <TouchableOpacity
           onPress={() => {
-            this.props.navigation.navigate('CityListPage')
+            this.props.navigation.navigate('CityListPage');
           }}
         >
           <View
@@ -260,11 +274,11 @@ export default class ConditionPage extends Component {
             selectedValue={this.state.selectedItem}
             itemStyle={{ color: 'black', fontSize: 26 }}
             onValueChange={(index) => {
-              console.log('---pickerindex,index', index)
+              console.log('---pickerindex,index', index);
               this.setState({
-                // currentSymbolValue: SYMBOL[index],
+                currentSymbolValue: SYMBOL[index],
                 range: SYMBOL[index],
-              })
+              });
             }}
           >
             {this.state.symbolList.map((value, i) => <PickerItem label={value} value={i} key={value} />)}
@@ -274,21 +288,17 @@ export default class ConditionPage extends Component {
             selectedValue={this.state.selectedItem}
             itemStyle={{ color: 'black', fontSize: 26 }}
             onValueChange={(index) => {
-              console.log('---pickerindex,index', index)
+              console.log('---pickerindex,index', index);
               this.setState({
                 currentTempValue: temperatureDatas[index],
-              })
+              });
             }}
           >
             {temperatureDatas.map((value, i) => <PickerItem label={value} value={i} key={value} />)}
           </Picker>
         </View>
-        <Toast
-          ref={(toast) => {
-            this.toast = toast
-          }}
-        />
+        <Toast ref={toast => (this.toast = toast)} />
       </View>
-    )
+    );
   }
 }

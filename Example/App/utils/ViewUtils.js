@@ -1,6 +1,8 @@
-/* eslint-disable */
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, TouchableOpacity, Image } from 'react-native'
+import React, { Component } from 'react';
+import {
+  View, StyleSheet, Text, TouchableOpacity, Image,
+} from 'react-native';
+
 export default class ViewUtils {
   /**
    * 获取设置页的Item
@@ -59,7 +61,7 @@ export default class ViewUtils {
       <TouchableOpacity style={{ padding: 8 }} onPress={callBack}>
         <Image style={{ width: 15, height: 26 }} source={require('../res/images/arrow_left.png')} />
       </TouchableOpacity>
-    )
+    );
   }
 }
 
@@ -72,4 +74,4 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
   },
-})
+});

@@ -1,3 +1,3 @@
-import Strings from './strings'
+import Strings from './strings';
 
-export default Strings
+export default Strings;

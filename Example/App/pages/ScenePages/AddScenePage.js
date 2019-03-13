@@ -1,31 +1,42 @@
-/* eslint-disable */
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, Image, Dimensions, TouchableOpacity, Switch, SwipeableFlatList } from 'react-native'
+import React, { Component } from 'react';
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  ImageBackground,
+  Dimensions,
+  TouchableOpacity,
+  Switch,
+  FlatList,
+  SwipeableFlatList,
+} from 'react-native';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
+import { resetAction } from '../../navigations/AppNavigator';
+import TuyaUserApi from '../../api/TuyaUserApi';
+import DeviceStorage from '../../utils/DeviceStorage';
+import TextButton from '../../component/TextButton';
+import Strings from '../../i18n';
+import TuyaSceneApi from '../../api/TuyaSceneApi';
+import EditDialog from '../../component/EditDialog';
 
-import { TuyaSceneApi } from 'tuyasmart-home-sdk'
-import { connect } from 'react-redux'
-import NavigationBar from '../../common/NavigationBar'
-import DeviceStorage from '../../utils/DeviceStorage'
-import Strings from '../../i18n'
-import EditDialog from '../../component/EditDialog'
-
-const { width } = Dimensions.get('window')
-/* eslint-disable global-require */
+const { height, width } = Dimensions.get('window');
 const Res = {
   scenebg: require('../../res/images/scenebg.png'),
   redAdd: require('../../res/images/red_add.png'),
   picTake: require('../../res/images/pic_take.png'),
   pen: require('../../res/images/pen.png'),
   trash: require('../../res/images/trash.png'),
-}
+};
 
-class AddScenePage extends Component {
+export default class AddScenePage extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
-    const params = this.props.navigation.state.params
+    const params = this.props.navigation.state.params;
 
-    console.log('--->params add Scene', params)
+    console.log('--->params add Scene', params);
 
     this.state = {
       onTop: true,
@@ -36,56 +47,56 @@ class AddScenePage extends Component {
       isEdit: params.isEdit, // 是否从已有的点击去编辑
       item: params.item,
       sceneId: params.item.id,
-      homeId: this.props.reducers.homeId,
-    }
+    };
   }
 
   componentWillMount() {
+    console.log('---->isEdit', this.state.isEdit);
     if (this.state.isEdit) {
       // 如果是true 就是跳编辑页面
-      const newArr = []
-      // const item = this.state.item;
-      const data = this.state.item.actions
+      const newArr = new Array();
+      const item = this.state.item;
+      const data = this.state.item.actions;
       for (let i = 0, j = data.length; i < j; i++) {
-        const actionDisplayNew = data[i].actionDisplayNew
-        let status
-        let key
-        let value
+        const actionDisplayNew = data[i].actionDisplayNew;
+        let status;
+        let key;
+        let value;
         for (const c in actionDisplayNew) {
-          key = c
-          status = actionDisplayNew[c]
+          key = c;
+          status = actionDisplayNew[c];
         }
-        if (status[1] === 'on' || status[1] === '开') {
-          value = true
+        if (status[1] == 'on' || status[1] == '开') {
+          value = true;
         } else {
-          value = false
+          value = false;
         }
-        console.log('--->status', status)
+        console.log('--->status', status);
         const action = {
           devId: data[i].entityId,
           devName: data[i].entityName,
           dpId: parseInt(key),
           dpName: status[0],
           value,
-        }
-        newArr.push(action)
+        };
+        newArr.push(action);
       }
-      DeviceStorage.save('Action', newArr)
-      console.log('Action', newArr)
+      DeviceStorage.save('Action', newArr);
+      console.log('Action', newArr);
       this.setState({
         ActionList: newArr,
-      })
+      });
     } else {
       DeviceStorage.get('Action')
         .then((data) => {
-          console.log('--->Action', data)
+          console.log('--->Action', data);
           this.setState({
             ActionList: data,
-          })
+          });
         })
         .catch((err) => {
-          console.log('--->Err', err)
-        })
+          console.log('--->Err', err);
+        });
     }
   }
 
@@ -93,11 +104,11 @@ class AddScenePage extends Component {
     return (
       <TouchableOpacity
         onPress={() => {
-          DeviceStorage.delete('Action')
+          DeviceStorage.delete('Action');
           this.setState({
             ActionList: [],
-          })
-          this.props.navigation.navigate('HomePage')
+          });
+          this.props.navigation.navigate('HomePage');
         }}
       >
         <Text
@@ -111,7 +122,7 @@ class AddScenePage extends Component {
           {name}
         </Text>
       </TouchableOpacity>
-    )
+    );
   }
 
   renderRightButton(name) {
@@ -119,17 +130,17 @@ class AddScenePage extends Component {
       <TouchableOpacity
         onPress={() => {
           if (this.state.isEdit) {
-            const ActionLists = this.state.ActionList
-            const devLists = []
+            const ActionLists = this.state.ActionList;
+            var devLists = new Array();
             for (let i = 0, j = ActionLists.length; i < j; i++) {
-              devLists.push(ActionLists[i].devId)
+              devLists.push(ActionLists[i].devId);
             }
-            console.log('----->devIds', devLists)
-            console.log('------->ActionLists', ActionLists)
-            console.log('---->scenId', this.state.sceneId)
+            console.log('----->devIds', devLists);
+            console.log('------->ActionLists', ActionLists);
+            console.log('---->scenId', this.state.sceneId);
             // 编辑调用modify
             TuyaSceneApi.modifyScene({
-              homeId: this.state.homeId,
+              homeId: 2040920,
               sceneId: this.state.sceneId,
               name: this.state.name,
               stickyOnTop: false,
@@ -138,40 +149,40 @@ class AddScenePage extends Component {
               tasks: ActionLists,
             })
               .then((data) => {
-                console.log('--->data', data)
-                DeviceStorage.delete('Action')
-                this.props.navigation.navigate('HomePage')
+                console.log('--->data', data);
+                DeviceStorage.delete('Action');
+                this.props.navigation.navigate('HomePage');
               })
               .catch((err) => {
-                console.log('-->err', err)
-              })
+                console.log('-->err', err);
+              });
           } else {
             // 第一次创建调用createScene
             if (this.state.ActionList.length > 0) {
-              const ActionLists = this.state.ActionList
-              const devLists = new Array()
+              const ActionLists = this.state.ActionList;
+              var devLists = new Array();
               for (let i = 0, j = ActionLists.length; i < j; i++) {
-                devLists.push(ActionLists[i].devId)
+                devLists.push(ActionLists[i].devId);
               }
-              console.log('----->devIds', devLists)
-              console.log('------->tasks', ActionLists)
+              console.log('----->devIds', devLists);
+              console.log('------->tasks', ActionLists);
               TuyaSceneApi.createScene({
-                homeId: this.state.homeId,
+                homeId: 2040920,
                 name: this.state.name,
                 stickyOnTop: false,
                 devIds: devLists,
-                background: 'a',
+                background: 'https://images.tuyacn.com/smart/rule/cover/bedroom.png',
                 matchType: 'MATCH_TYPE_OR',
                 tasks: ActionLists,
               })
                 .then((data) => {
-                  console.log('--->data', data)
-                  DeviceStorage.delete('Action')
-                  this.props.navigation.navigate('HomePage')
+                  console.log('--->data', data);
+                  DeviceStorage.delete('Action');
+                  this.props.navigation.navigate('HomePage');
                 })
                 .catch((err) => {
-                  console.log('-->err', err)
-                })
+                  console.log('-->err', err);
+                });
             } else {
               // 未添加动作
             }
@@ -189,7 +200,30 @@ class AddScenePage extends Component {
           {name}
         </Text>
       </TouchableOpacity>
-    )
+    );
+  }
+
+  _renderFooter() {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          this.props.navigation.navigate('AddActionPage', {
+            isFromScene: true,
+          });
+        }}
+      >
+        <View
+          style={{
+            width,
+            height: 60,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Text style={{ color: '#A2A3AA', fontSize: 13 }}>添加执行动作</Text>
+        </View>
+      </TouchableOpacity>
+    );
   }
 
   _renderItem(data) {
@@ -198,7 +232,7 @@ class AddScenePage extends Component {
         activeOpacity={1}
         style={styles.itemStyle}
         onPress={() => {
-          console.log('--->data.item', data.item)
+          console.log('--->data.item', data.item);
         }}
       >
         <Image style={{ height: 35, width: 35 }} source={Res.picTake} />
@@ -223,26 +257,26 @@ class AddScenePage extends Component {
           {`${data.item.value}`}
         </Text>
       </TouchableOpacity>
-    )
+    );
   }
 
   // 侧滑菜单渲染
-  getQuickActions = (item) => (
+  getQuickActions = item => (
     <View style={styles.quickAContent}>
       <TouchableOpacity
         activeOpacity={1}
         onPress={() => {
-          const newArr = new Array()
-          const data = this.state.ActionList
+          const newArr = new Array();
+          const data = this.state.ActionList;
           for (let i = 0, j = data.length; i < j; i++) {
             if (data[i].dpId !== item.dpId) {
-              newArr.push(data[i])
+              newArr.push(data[i]);
             }
           }
           this.setState({
             ActionList: newArr,
-          })
-          DeviceStorage.save('Action', newArr)
+          });
+          DeviceStorage.save('Action', newArr);
         }}
       >
         <View style={styles.quick}>
@@ -251,29 +285,6 @@ class AddScenePage extends Component {
       </TouchableOpacity>
     </View>
   )
-
-  _renderFooter() {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          this.props.navigation.navigate('AddActionPage', {
-            isFromScene: true,
-          })
-        }}
-      >
-        <View
-          style={{
-            width,
-            height: 60,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text style={{ color: '#A2A3AA', fontSize: 13 }}>添加执行动作</Text>
-        </View>
-      </TouchableOpacity>
-    )
-  }
 
   render() {
     return (
@@ -314,7 +325,7 @@ class AddScenePage extends Component {
             onPress={() => {
               this.setState({
                 editVisible: true,
-              })
+              });
             }}
           >
             <Text
@@ -352,7 +363,7 @@ class AddScenePage extends Component {
               onPress={() => {
                 this.props.navigation.navigate('AddActionPage', {
                   isFromScene: true,
-                })
+                });
               }}
             >
               <Text style={{ fontSize: 16, color: '#FFFFFF' }}>+</Text>
@@ -368,7 +379,7 @@ class AddScenePage extends Component {
           <SwipeableFlatList
             data={this.state.ActionList}
             ref={(ref) => {
-              this._flatListRef = ref
+              this._flatListRef = ref;
             }}
             renderItem={this._renderItem}
             style={{ width }}
@@ -395,7 +406,7 @@ class AddScenePage extends Component {
             onValueChange={() => {
               this.setState({
                 onTop: !this.state.onTop,
-              })
+              });
             }}
           />
         </View>
@@ -413,19 +424,21 @@ class AddScenePage extends Component {
               marginLeft: 130,
             }}
             onPress={() => {
-              console.warn('--->')
+              console.warn('--->');
               TuyaSceneApi.deleteScene({ sceneId: this.state.sceneId })
                 .then((data) => {
-                  console.warn('--->deleteScene', data)
-                  DeviceStorage.delete('Action')
+                  console.warn('--->deleteScene', data);
+                  DeviceStorage.delete('Action');
                   this.setState({
                     ActionList: [],
-                  })
-                  this.props.navigation.navigate('HomePage')
+                  });
+                  this.props.navigation.navigate('HomePage');
                 })
                 .catch((err) => {
-                  // 相关操作
-                })
+                  console.warn((err) => {
+                    console.warn('-->err', err);
+                  });
+                });
             }}
           >
             <Image source={Res.trash} style={{ width: 18, height: 18, marginLeft: 10 }} />
@@ -438,22 +451,22 @@ class AddScenePage extends Component {
           textValue={(value) => {
             this.setState({
               nameValue: value,
-            })
+            });
           }}
           save={() => {
             this.setState({
               name: this.state.nameValue,
               editVisible: false,
-            })
+            });
           }}
           cancel={() => {
             this.setState({
               editVisible: false,
-            })
+            });
           }}
         />
       </View>
-    )
+    );
   }
 }
 
@@ -485,7 +498,4 @@ const styles = StyleSheet.create({
     width,
     backgroundColor: '#FFFFFF',
   },
-})
-export default connect((state) => ({
-  ...state,
-}))(AddScenePage)
+});

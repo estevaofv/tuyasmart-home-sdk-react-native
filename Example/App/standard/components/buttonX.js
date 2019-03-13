@@ -1,9 +1,10 @@
-/* eslint-disable */
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
-import { Image, View, StyleSheet, Text, TouchableOpacity, ColorPropType, ViewPropTypes } from 'react-native'
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import {
+  Image, View, StyleSheet, Text, TouchableOpacity, ColorPropType, ViewPropTypes,
+} from 'react-native';
 
-import RefText from './refText'
+import RefText from './refText';
 
 export default class ButtonX extends Component {
   /* eslint-disable react/require-default-props */
@@ -35,7 +36,7 @@ export default class ButtonX extends Component {
         style={[styles.textStyle, this.props.textStyle, this.props.tintColor && { color: this.props.tintColor }]}
         text={this.props.text}
       />
-    )
+    );
   }
 
   render() {
@@ -50,8 +51,8 @@ export default class ButtonX extends Component {
       textDirection,
       disabledOpacity,
       ...fprops
-    } = this.props
-    const direction = !!text && (textDirection === 'left' || textDirection === 'right') ? 'row' : 'column'
+    } = this.props;
+    const direction = !!text && (textDirection === 'left' || textDirection === 'right') ? 'row' : 'column';
     return (
       <TouchableOpacity {...fprops} style={[styles.container, style]}>
         <View
@@ -69,13 +70,13 @@ export default class ButtonX extends Component {
               <Image
                 onLayout={({ nativeEvent: { layout: { width: layoutWidth, height: layoutHeight } } }) => {
                   if (this.__boxSize || layoutWidth * layoutHeight === 0) {
-                    return
+                    return;
                   }
                   this.__boxSize = {
                     width: layoutWidth,
                     height: layoutHeight,
-                  }
-                  this.setState({})
+                  };
+                  this.setState({});
                 }}
                 resizeMode="contain"
                 source={image}
@@ -89,7 +90,7 @@ export default class ButtonX extends Component {
           {!!text && (textDirection === 'right' || textDirection === 'bottom') && this._renderText()}
         </View>
       </TouchableOpacity>
-    )
+    );
   }
 }
 
@@ -118,4 +119,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     backgroundColor: 'transparent',
   },
-})
+});

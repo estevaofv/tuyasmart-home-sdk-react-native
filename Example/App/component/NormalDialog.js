@@ -1,9 +1,18 @@
-/* eslint-disable */
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
-import { StyleSheet, Dimensions, Modal } from 'react-native'
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import {
+  Image,
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  ColorPropType,
+  ViewPropTypes,
+  Dimensions,
+  Modal,
+} from 'react-native';
 
-const { height, width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window');
 
 export default class NormalDialog extends Component {
   static propTypes = {
@@ -17,7 +26,7 @@ export default class NormalDialog extends Component {
   }
 
   constructor(props) {
-    super(props)
+    super(props);
   }
 
   render() {
@@ -26,11 +35,11 @@ export default class NormalDialog extends Component {
         visible={this.props.visible}
         transparent={false}
         onRequestClose={() => {
-          console.warn('--->aa')
+          console.warn('--->aa');
         }}
         style={styles.container}
       />
-    )
+    );
   }
 }
 const styles = StyleSheet.create({
@@ -94,4 +103,4 @@ const styles = StyleSheet.create({
     paddingTop: 4,
     textAlign: 'center',
   },
-})
+});

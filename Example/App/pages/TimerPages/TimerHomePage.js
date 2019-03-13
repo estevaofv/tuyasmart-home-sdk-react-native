@@ -1,111 +1,117 @@
-/* eslint-disable */
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import {
   Text,
   View,
   StyleSheet,
+  Image,
   TouchableOpacity,
+  FlatList,
   Switch,
   Dimensions,
   RefreshControl,
   SwipeableFlatList,
-} from 'react-native'
-import Toast from 'react-native-easy-toast'
-import { TuyaTimerApi } from 'tuyasmart-home-sdk'
-import Strings from '../../i18n'
-import ButtonX from '../../standard/components/buttonX'
-import NavigationBar from '../../common/NavigationBar'
-import ViewUtils from '../../utils/ViewUtils'
+  Platform,
+} from 'react-native';
+import Toast, { DURATION } from 'react-native-easy-toast';
+import Strings from '../../i18n';
+import ButtonX from '../../standard/components/buttonX';
+import TuyaTimerApi from '../../api/TuyaTimerApi';
+import NavigationBar from '../../common/NavigationBar';
+import ViewUtils from '../../utils/ViewUtils';
 
-const { width } = Dimensions.get('window')
-/* eslint-disable global-require */
+const { height, width } = Dimensions.get('window');
+
 const Res = {
   // close: require('../res/whitewindowclose.png'),
   // open: require('../res/whitewindowopen.png'),
   addSchedule: require('../../res/images/addSchedule.png'),
-}
-
+};
 export default class TimerHomePage extends Component {
   constructor(props) {
-    super(props)
-    const params = this.props.navigation.state.params
-    console.log('---params', params)
+    super(props);
+    const params = this.props.navigation.state.params;
+    console.log('---params', params);
     this.state = {
-      // data: [],
+      data: [],
       isRefreshing: false,
       devId: params.devId,
-      // allTimer: [],
+      allTimer: [],
       timerList: [],
-      // category: '',
-      // status: 1,
+      category: '',
+      status: 1,
       devInfo: params.devInfo,
-    }
+    };
     // this.getDatas();
+  }
+
+  getDatas() {
+    const s = this.props.navigation.state.params;
+    this.setState({
+      isRefreshing: true,
+    });
   }
 
   componentDidMount() {
     TuyaTimerApi.getAllTimerWithDeviceId({ devId: this.state.devId })
       .then((data) => {
-        console.log('--->sdk timer', data)
-        const newArrTimerList = []
-        if (data) {
-          if (data.length > 0) {
-            for (let i = 0, j = data.length; i < j; i++) {
-              for (let a = 0, b = data[i].timerList.length; a < b; a++) {
-                newArrTimerList.push(data[i].timerList[a])
-              }
-            }
-          }
-        }
-        console.log('----->newArrTimerList', newArrTimerList)
+        console.log('----getAllTimerWithDeviceId', data);
+        let newArrTimerList = new Array();
+        newArrTimerList = data.timer;
+        console.log('---->data---', data.timer);
+        console.log('----->newArrTimerList', newArrTimerList);
         this.setState({
           timerList: newArrTimerList,
-        })
+        });
       })
       .catch((err) => {
-        console.log('--->err', err)
-      })
+        console.log('--->err');
+      });
   }
 
-  getDatas() {
-    // const s = this.props.navigation.state.params;
-    this.setState({
-      isRefreshing: true,
-    })
+  toAddSchedules(data, isFirst, category) {
+    const s = this.props.navigation.state.params;
+    this.props.navigation.navigate('SchedulePage', {
+      devId: `${s.id}`,
+      success: () => this.getDatas(),
+      data,
+      devInfo: this.state.devInfo,
+      isFirst,
+      category,
+    });
   }
 
   getParseTime(itme) {
-    const d = itme.split(':')
-    const h = d[0]
-    if (h === '00') {
-      return `${'12' + ':'}${d[1]} PM`
+    const d = itme.split(':');
+    const h = d[0];
+    if (h == '00') {
+      return `${'12' + ':'}${d[1]} PM`;
     }
     if (parseInt(h) > 12) {
-      return `${parseInt(h) - 12}:${d[1]} PM`
+      return `${parseInt(h) - 12}:${d[1]} PM`;
     }
-    return `${parseInt(h)}:${d[1]} AM`
+    return `${parseInt(h)}:${d[1]} AM`;
   }
 
   getParseTimeArray(itme) {
-    const d = itme.split(':')
-    let h = d[0]
+    const d = itme.split(':');
+    let h = d[0];
     if (h == '00') {
-      return ['12', d[1], 'PM']
+      return ['12', d[1], 'PM'];
     }
     if (parseInt(h) > 12) {
-      h = parseInt(h) - 12
+      h = parseInt(h) - 12;
       if (h < 10) {
-        h = `0${h}`
+        h = `0${h}`;
       }
-      h += ''
-      return [h, d[1], 'PM']
+      h += '';
+      return [h, d[1], 'PM'];
     }
-    h = parseInt(h)
+    h = parseInt(h);
     if (h < 10) {
-      h = `0${h}`
+      h = `0${h}`;
     }
-    h += ''
-    return [h, d[1], 'AM']
+    h += '';
+    return [h, d[1], 'AM'];
   }
 
   updateTimerStatus(item, index) {
@@ -116,46 +122,46 @@ export default class TimerHomePage extends Component {
       timeId: item.timerId,
       isOpen: !item.open,
     }).then((data) => {
-      this.state.timerList[index].open = !item.open
+      this.state.timerList[index].open = !item.open;
       this.setState({
         timerList: this.state.timerList,
-      })
-    })
+      });
+    });
   }
 
   parseTime(time) {
-    const d = time.split(':')
-    let t = 'AM'
-    const m = d[1]
-    let h = d[0]
+    const d = time.split(':');
+    let t = 'AM';
+    const m = d[1];
+    let h = d[0];
     if (parseInt(d[0]) > 12) {
-      t = 'PM'
-      h = parseInt(d[0]) - 12
+      t = 'PM';
+      h = parseInt(d[0]) - 12;
       if (h < 10) {
-        h = `0${h}`
+        h = `0${h}`;
       }
     }
     return {
       time: t,
       h,
       m,
-    }
+    };
   }
 
   renderWeekDays(item) {
-    const weeks = ['S', 'M', 'T', 'W', 'TH', 'F', 'S']
+    const weeks = ['S', 'M', 'T', 'W', 'TH', 'F', 'S'];
     return (
       <View style={{ flexDirection: 'row', marginTop: 8 }}>
         {weeks.map((d, index) => <Text style={item.loops[index] == '1' ? styles.select : styles.noraml}>{d}</Text>)}
       </View>
-    )
+    );
   }
 
   getOpenStatus(status) {
-    if (status === 1) {
-      return true
+    if (status == 1) {
+      return true;
     }
-    return false
+    return false;
   }
 
   render() {
@@ -164,7 +170,7 @@ export default class TimerHomePage extends Component {
         <NavigationBar
           style={{ backgroundColor: '#F4F4F5', width }}
           leftButton={ViewUtils.getLeftButton(() => {
-            this.props.navigation.pop()
+            this.props.navigation.pop();
           })}
           title="定时"
         />
@@ -174,8 +180,8 @@ export default class TimerHomePage extends Component {
             <TouchableOpacity
               onPress={() => {
                 // 先屏蔽进入的入口
-                console.log('--->onPressitem', item)
-                const time = this.getParseTimeArray(item.time)
+                console.log('--->onPressitem', item);
+                const time = this.getParseTimeArray(item.time);
                 this.toAddSchedules(
                   {
                     h: time[0],
@@ -186,7 +192,7 @@ export default class TimerHomePage extends Component {
                   },
                   false,
                   item.category,
-                )
+                );
               }}
             >
               <View style={styles.item}>
@@ -194,19 +200,19 @@ export default class TimerHomePage extends Component {
                 <Switch
                   style={{ marginRight: 20 }}
                   onValueChange={(value) => {
-                    console.log('--->value', value)
-                    this.updateTimerStatus(item, index)
+                    console.log('---->Switch value');
+                    this.updateTimerStatus(item, index);
                   }}
                   value={item.open}
                   thumbColor="white"
                   trackColor="#7DB428"
-                  // trackColor="#A09E9B"
+                  trackColor="#A09E9B"
                 />
               </View>
             </TouchableOpacity>
           )}
           style={{ marginTop: 21 }}
-          refreshControl={
+          refreshControl={(
             <RefreshControl
               refreshing={this.state.isRefreshing}
               onRefresh={() => this.getDatas()}
@@ -216,7 +222,7 @@ export default class TimerHomePage extends Component {
               colors={['#ff0000', '#00ff00', '#0000ff']}
               progressBackgroundColor="#ffff00"
             />
-          }
+)}
           renderQuickActions={({ item }) => this.getQuickActions(item)} // 创建侧滑菜单
           maxSwipeDistance={80} // 可展开（滑动）的距离
           bounceFirstRowOnMount // 进去的时候不展示侧滑效果
@@ -234,12 +240,12 @@ export default class TimerHomePage extends Component {
           textStyle={{ color: 'white' }}
         />
       </View>
-    )
+    );
   }
 
   // 侧滑菜单渲染
   getQuickActions = (item) => {
-    const s = this.props.navigation.state.params
+    const s = this.props.navigation.state.params;
     return (
       <View style={styles.quickAContent}>
         <TouchableOpacity
@@ -249,21 +255,21 @@ export default class TimerHomePage extends Component {
               devId: this.state.devId,
               timeId: item.timerId,
             })
-              .then(() => {
-                this.refs.toast.show('删除成功了')
-                const timeList = this.state.timerList
-                const id = item.timerId
-                const newArr = []
+              .then((data) => {
+                this.refs.toast.show('删除成功了');
+                const timeList = this.state.timerList;
+                const id = item.timerId;
+                const newArr = new Array();
                 for (let i = 0, j = timeList.length; i < j; i++) {
-                  if (timeList[i].timerId !== id) {
-                    newArr.push(timeList[i])
+                  if (timeList[i].timerId != id) {
+                    newArr.push(timeList[i]);
                   }
                 }
                 this.setState({
                   timerList: newArr,
-                })
+                });
               })
-              .catch(() => {})
+              .catch((err) => {});
           }}
         >
           <View style={styles.quick}>
@@ -271,19 +277,7 @@ export default class TimerHomePage extends Component {
           </View>
         </TouchableOpacity>
       </View>
-    )
-  }
-
-  toAddSchedules(data, isFirst, category) {
-    const s = this.props.navigation.state.params
-    this.props.navigation.navigate('SchedulePage', {
-      devId: `${s.id}`,
-      success: () => this.getDatas(),
-      data,
-      devInfo: this.state.devInfo,
-      isFirst,
-      category,
-    })
+    );
   }
 }
 
@@ -346,4 +340,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-})
+});

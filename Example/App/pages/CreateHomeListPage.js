@@ -1,50 +1,49 @@
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, Image, Dimensions, TouchableOpacity } from 'react-native'
-import { TuyaHomeManagerApi } from 'tuyasmart-home-sdk'
-import NavigationBar from '../common/NavigationBar'
-import ButtonX from '../standard/components/buttonX'
-import ViewUtils from '../utils/ViewUtils'
+import React, { Component } from 'react';
+import {
+  View, StyleSheet, Text, Image, ImageBackground, Dimensions, TouchableOpacity,
+} from 'react-native';
+import NavigationBar from '../common/NavigationBar';
+import ButtonX from '../standard/components/buttonX';
+import ViewUtils from '../utils/ViewUtils';
+import TuyaHomeManagerApi from '../api/TuyaHomeManagerApi';
 
-const { width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window');
 export default class CreateHomeListPage extends Component {
-  // constructor(props) {
-  //   super(props);
-  // }
+  constructor(props) {
+    super(props);
+  }
 
   _renderRightBtn() {
     return (
       <ButtonX
         onPress={() => {
-          console.warn('---->点击了')
           TuyaHomeManagerApi.createHome({
             name: '我的家',
-            lon: 39.57,
-            lat: 40.67,
+            lon: 80.99,
+            lat: 80.99,
             geoName: '北京',
             rooms: ['客厅', '主卧'],
           })
             .then((data) => {
-              console.warn('----->createHome', data)
-              this.props.navigation.navigate('HomePage')
+              this.props.navigation.navigate('HomePage');
             })
             .catch((err) => {
-              console.warn('err', err)
-            })
+              console.warn('err', err);
+            });
         }}
       >
         <Text style={{ fontSize: 18, color: 'black', marginRight: 10 }}>保存</Text>
       </ButtonX>
-    )
+    );
   }
 
-  /* eslint-disable global-require */
   render() {
     return (
       <View style={styles.container}>
         <NavigationBar
           style={{ backgroundColor: '#FFFFFF', width }}
           leftButton={ViewUtils.getLeftButton(() => {
-            this.props.navigation.pop()
+            this.props.navigation.pop();
           })}
           rightButton={this._renderRightBtn()}
           title="家庭设置"
@@ -137,7 +136,7 @@ export default class CreateHomeListPage extends Component {
           </View>
         </TouchableOpacity>
       </View>
-    )
+    );
   }
 }
 
@@ -145,10 +144,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
+    backgroundColor: 'transparent',
     justifyContent: 'flex-start',
+
     backgroundColor: '#F8F8F8',
   },
   tips: {
     fontSize: 29,
   },
-})
+});

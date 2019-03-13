@@ -1,4 +1,4 @@
-import Strings from '../i18n'
+import Strings from '../i18n';
 
 export const ConditionConfig = [
   {
@@ -26,7 +26,7 @@ export const ConditionConfig = [
     key: 'airquality',
     type: 'aqi',
   },
-]
+];
 
 export const weatherConfig = [
   {
@@ -45,7 +45,7 @@ export const weatherConfig = [
     label: 'Cloudy',
     key: 'Cloud',
   },
-]
+];
 
 export const humidityConfig = [
   {
@@ -60,8 +60,7 @@ export const humidityConfig = [
     label: 'High',
     key: 'humidityhight',
   },
-]
-
+];
 export const sunriseConfig = [
   {
     label: 'Sunrise',
@@ -71,8 +70,7 @@ export const sunriseConfig = [
     label: 'Sunset',
     key: 'sunnersetager',
   },
-]
-
+];
 export const airConfig = [
   {
     label: 'Low',
@@ -86,11 +84,11 @@ export const airConfig = [
     label: 'High',
     key: 'Polluted',
   },
-]
+];
 
 export const conditionSettingConfig = {
   condition: weatherConfig,
   humidity: humidityConfig,
   sunsetrise: sunriseConfig,
   aqi: airConfig,
-}
+};

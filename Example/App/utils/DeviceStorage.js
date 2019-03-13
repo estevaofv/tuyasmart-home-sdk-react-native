@@ -1,9 +1,8 @@
-/* eslint-disable */
-import { AsyncStorage } from 'react-native'
+import React, { AsyncStorage } from 'react-native';
 
-export const FIRSTLOADGUIDE = 'firstLoadGuide'
-export const CONDITION = 'condition'
-export const CITY = 'city'
+export const FIRSTLOADGUIDE = 'firstLoadGuide';
+export const CONDITION = 'condition';
+export const CITY = 'city';
 class DeviceStorage {
   /**
    * 获取
@@ -13,9 +12,9 @@ class DeviceStorage {
 
   static get(key) {
     return AsyncStorage.getItem(key).then((value) => {
-      const jsonValue = JSON.parse(value)
-      return jsonValue
-    })
+      const jsonValue = JSON.parse(value);
+      return jsonValue;
+    });
   }
 
   /**
@@ -25,7 +24,7 @@ class DeviceStorage {
    * @returns {*}
    */
   static save(key, value) {
-    return AsyncStorage.setItem(key, JSON.stringify(value))
+    return AsyncStorage.setItem(key, JSON.stringify(value));
   }
 
   /**
@@ -36,17 +35,17 @@ class DeviceStorage {
    */
   static update(key, value) {
     return DeviceStorage.get(key).then((item) => {
-      value = typeof value === 'string' ? value : Object.assign({}, item, value)
-      return AsyncStorage.setItem(key, JSON.stringify(value))
-    })
+      value = typeof value === 'string' ? value : Object.assign({}, item, value);
+      return AsyncStorage.setItem(key, JSON.stringify(value));
+    });
   }
 
   static saveUserInfo(phone, password, countryCode) {
-    return this.save('userInfo', JSON.stringify({ phone, password, countryCode })).catch((error) => console.log(error))
+    return this.save('userInfo', JSON.stringify({ phone, password, countryCode })).catch(error => console.log(error));
   }
 
   static getUserInfo() {
-    return this.get('userInfo')
+    return this.get('userInfo');
   }
 
   /**
@@ -55,8 +54,8 @@ class DeviceStorage {
    * @returns {*}
    */
   static delete(key) {
-    return AsyncStorage.removeItem(key)
+    return AsyncStorage.removeItem(key);
   }
 }
 
-export default DeviceStorage
+export default DeviceStorage;

@@ -1,22 +1,25 @@
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, Image, Dimensions, FlatList, TouchableOpacity } from 'react-native'
-import { connect } from 'react-redux'
-import { TuyaShareApi } from 'tuyasmart-home-sdk'
-import NavigationBar from '../../common/NavigationBar'
-import ViewUtils from '../../utils/ViewUtils'
+import React, { Component } from 'react';
+import {
+  View, StyleSheet, Text, Image, ImageBackground, Dimensions, FlatList, TouchableOpacity,
+} from 'react-native';
+import { connect } from 'react-redux';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
+import ViewUtils from '../../utils/ViewUtils';
+import TuyaShareApi from '../../api/TuyaShareApi';
 
-const { width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window');
 
 class SharePage extends Component {
   constructor(props) {
-    super(props)
-    const params = this.props.navigation.state.params
-    console.log('share params', params)
+    super(props);
+    const params = this.props.navigation.state.params;
+    console.log('share params', params);
     this.state = {
       homeId: params.homeId,
       shareList: [],
       devId: params.devId,
-    }
+    };
   }
 
   componentDidMount() {
@@ -24,21 +27,20 @@ class SharePage extends Component {
       .then((data) => {
         this.setState({
           shareList: data,
-        })
+        });
       })
       .catch((err) => {
-        console.warn('-->err', err)
-      })
+        console.warn('-->err', err);
+      });
   }
 
-  /* eslint-disable global-require */
   render() {
     return (
       <View style={styles.container}>
         <NavigationBar
           style={{ backgroundColor: '#FFFFFF', width }}
           leftButton={ViewUtils.getLeftButton(() => {
-            this.props.navigation.pop()
+            this.props.navigation.pop();
           })}
           // rightButton={this._renderRightBtn()}
           title="共享设备"
@@ -88,13 +90,13 @@ class SharePage extends Component {
             this.props.navigation.navigate('AddSharePage', {
               homeId: this.state.homeId,
               devId: this.state.devId,
-            })
+            });
           }}
         >
           <Text style={{ fontSize: 16, color: '#FF4800', fontWeight: 'bold' }}>添加共享</Text>
         </TouchableOpacity>
       </View>
-    )
+    );
   }
 }
 
@@ -102,6 +104,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
+    backgroundColor: 'transparent',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     backgroundColor: '#F8F8F8',
@@ -119,8 +122,8 @@ const styles = StyleSheet.create({
     width,
     backgroundColor: '#FFFFFF',
   },
-})
+});
 
-export default connect((state) => ({
+export default connect(state => ({
   ...state,
-}))(SharePage)
+}))(SharePage);

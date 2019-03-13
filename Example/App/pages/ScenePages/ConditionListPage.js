@@ -1,36 +1,41 @@
-import React, { Component } from 'react'
-import { View, Text, Image, Dimensions, TouchableOpacity, FlatList } from 'react-native'
-import { TuyaSceneApi } from 'tuyasmart-home-sdk'
-import NavigationBar from '../../common/NavigationBar'
-import ViewUtils from '../../utils/ViewUtils'
+import React, { Component } from 'react';
+import {
+  View, StyleSheet, Text, Image, ImageBackground, Dimensions, TouchableOpacity, FlatList,
+} from 'react-native';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
+import { resetAction } from '../../navigations/AppNavigator';
+import TuyaSceneApi from '../../api/TuyaSceneApi';
+import DeviceStorage from '../../utils/DeviceStorage';
+import TextButton from '../../component/TextButton';
+import ViewUtils from '../../utils/ViewUtils';
 
-const { width } = Dimensions.get('window')
-/* eslint-disable global-require */
+const { height, width } = Dimensions.get('window');
 const Res = {
   enterScene: require('../../res/images/enterCondition.png'),
   enterCondition: require('../../res/images/enterScene.png'),
   exit: require('../../res/images/exit.png'),
   arrowRight: require('../../res/images/Arrow_right.png'),
-}
+};
 
 export default class ConditionListPage extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       conditionList: [],
-    }
+    };
   }
 
   componentDidMount() {
     TuyaSceneApi.getConditionList({ showFahrenheit: false })
       .then((data) => {
-        console.log('---->getConditionList', data)
-        this.setState({ conditionList: data })
+        console.log('---->getConditionList', data);
+        this.setState({ conditionList: data });
       })
       .catch((err) => {
-        console.log('--->err', err)
-      })
+        console.log('--->err', err);
+      });
   }
 
   render() {
@@ -47,7 +52,7 @@ export default class ConditionListPage extends Component {
         <NavigationBar
           style={{ backgroundColor: '#F4F4F5', width }}
           leftButton={ViewUtils.getLeftButton(() => {
-            this.props.navigation.pop()
+            this.props.navigation.pop();
           })}
           title="选择条件"
         />
@@ -57,10 +62,10 @@ export default class ConditionListPage extends Component {
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => {
-                console.log('---->item', item)
+                console.log('---->item', item);
                 this.props.navigation.navigate('ConditionPage', {
                   item,
-                })
+                });
               }}
             >
               <View
@@ -80,6 +85,6 @@ export default class ConditionListPage extends Component {
           )}
         />
       </View>
-    )
+    );
   }
 }

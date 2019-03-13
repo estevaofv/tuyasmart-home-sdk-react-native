@@ -1,82 +1,81 @@
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, Image, Dimensions, FlatList, TouchableOpacity } from 'react-native'
-// import { TuyaShareApi } from 'tuyasmart-home-sdk';
-// import { TuyaHomeApi } from 'tuyasmart-home-sdk';
-import { TuyaGroupApi, TuyaHomeApi } from 'tuyasmart-home-sdk'
-import { connect } from 'react-redux'
-import NavigationBar from '../../common/NavigationBar'
-// import ButtonX from '../../standard/components/buttonX';
-import ViewUtils from '../../utils/ViewUtils'
-import EditDialog from '../../component/EditDialog'
+import React, { Component } from 'react';
+import {
+  View, StyleSheet, Text, Image, ImageBackground, Dimensions, FlatList, TouchableOpacity,
+} from 'react-native';
+import { connect } from 'react-redux';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
+import ViewUtils from '../../utils/ViewUtils';
+import TuyaShareApi from '../../api/TuyaShareApi';
+import TuyaHomeApi from '../../api/TuyaHomeApi';
+import TuyaGroupApi from '../../api/TuyaGroupApi';
+import EditDialog from '../../component/EditDialog';
 
-const { width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window');
 
-/* eslint-disable global-require */
 const Res = {
   choose: require('../../res/images/choose.png'),
   choose_un: require('../../res/images/choose_un.png'),
-}
+};
 
 class GroupPage extends Component {
   constructor(props) {
-    super(props)
-    const params = this.props.navigation.state.params
-    console.log('share params', params)
+    super(props);
+    const params = this.props.navigation.state.params;
+    console.log('share params', params);
     this.state = {
       homeId: params.homeId,
       devLists: [],
-      // devId: params.devId,
+      devId: params.devId,
       productId: params.productId,
       editVisible: false,
       nameValue: '',
       chooseDevids: [],
-    }
+    };
   }
 
   componentDidMount() {
-    console.log('-->this.state', this.state.productId)
+    console.log('-->this.state', this.state.productId);
     TuyaHomeApi.getHomeDetail({
       homeId: this.state.homeId,
     })
       .then((data) => {
-        const deviceList = data.deviceList
-        const productList = []
+        const deviceList = data.deviceList;
+        const productList = new Array();
         for (let i = 0, j = deviceList.length; i < j; i++) {
-          if (deviceList[i].productId === this.state.productId) {
-            productList.push(deviceList[i])
+          if (deviceList[i].productId == this.state.productId) {
+            productList.push(deviceList[i]);
           }
         }
         for (let i = 0, j = productList.length; i < j; i++) {
-          console.log('-----------------')
-          productList[i].isChoose = false
+          console.log('-----------------');
+          productList[i].isChoose = false;
         }
 
-        console.log('--->productList', productList)
+        console.log('--->productList', productList);
         this.setState({
           devLists: productList,
-        })
+        });
       })
-      .catch((err) => {
-        console.warn('err', err)
-      })
+      .catch((err) => {});
   }
 
   _renderRightBtn(name) {
     return (
       <TouchableOpacity
         onPress={() => {
-          console.log('--->this.state', this.state.devLists)
-          const data = this.state.devLists
-          const chooseList = []
+          console.log('--->this.state', this.state.devLists);
+          const data = this.state.devLists;
+          const chooseList = new Array();
           for (let i = 0, j = data.length; i < j; i++) {
             if (data[i].isChoose === true) {
-              chooseList.push(data[i].devId)
+              chooseList.push(data[i].devId);
             }
           }
           this.setState({
             editVisible: true,
             chooseDevids: chooseList,
-          })
+          });
         }}
       >
         <Text
@@ -90,7 +89,7 @@ class GroupPage extends Component {
           {name}
         </Text>
       </TouchableOpacity>
-    )
+    );
   }
 
   render() {
@@ -99,7 +98,7 @@ class GroupPage extends Component {
         <NavigationBar
           style={{ backgroundColor: '#FFFFFF', width }}
           leftButton={ViewUtils.getLeftButton(() => {
-            this.props.navigation.pop()
+            this.props.navigation.pop();
           })}
           rightButton={this._renderRightBtn('保存')}
           title="共享设备"
@@ -129,12 +128,12 @@ class GroupPage extends Component {
           renderItem={({ item, index }) => (
             <TouchableOpacity
               onPress={() => {
-                const data = this.state.devLists
-                data[index].isChoose = !data[index].isChoose
-                console.log('--> data[index].isChoose', data[index].isChoose)
+                const data = this.state.devLists;
+                data[index].isChoose = !data[index].isChoose;
+                console.log('--> data[index].isChoose', data[index].isChoose);
                 this.setState({
                   devLists: data,
-                })
+                });
               }}
             >
               <View style={styles.itemStyle}>
@@ -167,35 +166,31 @@ class GroupPage extends Component {
           textValue={(value) => {
             this.setState({
               nameValue: value,
-            })
+            });
           }}
           save={() => {
             // this.setState({
             //   name: this.state.nameValue,
             //   editVisible: false
             // });
-            // const name = this.state.nameValue;
+            const name = this.state.nameValue;
             TuyaGroupApi.createGroup({
               homeId: this.state.homeId,
               productId: this.state.productId,
               name: this.state.nameValue,
               devIds: this.state.chooseDevids,
             })
-              .then((data) => {
-                console.warn('--->data', data)
-              })
-              .catch((err) => {
-                console.warn('err->', err)
-              })
+              .then((data) => {})
+              .catch((err) => {});
           }}
           cancel={() => {
             this.setState({
               editVisible: false,
-            })
+            });
           }}
         />
       </View>
-    )
+    );
   }
 }
 
@@ -203,7 +198,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    // backgroundColor: 'transparent',
+    backgroundColor: 'transparent',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     backgroundColor: '#F8F8F8',
@@ -222,8 +217,8 @@ const styles = StyleSheet.create({
     width,
     backgroundColor: '#FFFFFF',
   },
-})
+});
 
-export default connect((state) => ({
+export default connect(state => ({
   ...state,
-}))(GroupPage)
+}))(GroupPage);

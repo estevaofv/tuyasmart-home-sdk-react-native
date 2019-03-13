@@ -1,88 +1,90 @@
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, Image, TextInput, TouchableOpacity, Dimensions } from 'react-native'
-import Toast from 'react-native-easy-toast'
-import { TuyaUserApi } from 'tuyasmart-home-sdk'
-import { resetAction } from '../../navigations/AppNavigator'
-import NavigationBar from '../../common/NavigationBar'
-import ButtonX from '../../standard/components/buttonX'
-import CheckUtils from '../../utils/CheckUtils'
-import Strings from '../../i18n'
-import TextButton from '../../component/TextButton'
-import DeviceStorage from '../../utils/DeviceStorage'
+import React, { Component } from 'react';
+import {
+  View, StyleSheet, Text, Image, ImageBackground, TextInput, TouchableOpacity, Dimensions,
+} from 'react-native';
+import Toast, { DURATION } from 'react-native-easy-toast';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
+import CheckUtils from '../../utils/CheckUtils';
+import CountDownButton from '../../component/CountDownButton';
+import Strings from '../../i18n';
+import TextButton from '../../component/TextButton';
+import TuyaUserApi from '../../api/TuyaUserApi';
+import DeviceStorage from '../../utils/DeviceStorage';
+import { resetAction } from '../../navigations/AppNavigator';
 
-const { width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window');
 
 export default class LoginPage extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
-      // codettile: Strings.Verification_code,
-      // ValidateCode: '',
+      codettile: Strings.Verification_code,
+      ValidateCode: '',
       password: '',
-      // canreigstr: true,
+      canreigstr: true,
       useName: '',
       cityCode: '86',
-    }
+    };
   }
 
-  loginConfirm() {
-    if (this.state.useName.indexOf('@') >= 0) {
-      TuyaUserApi.loginWithEmail({
-        email: `${this.state.useName}`,
-        password: this.state.password,
-        countryCode: this.state.cityCode,
-      })
-        .then(() => {
-          DeviceStorage.saveUserInfo(`${this.state.useName}`, this.state.password, `${this.state.cityCode}`).then(
-            () => {
-              this.props.navigation.dispatch(resetAction('HomePage'))
-            },
-          )
-        })
-        .catch((error) => {
-          this.toast.show(error.toString().slice(7))
-        })
-    } else {
-      const LoginEnable = CheckUtils.isPoneAvailable(this.state.useName) && CheckUtils.isPassWord(this.state.password)
-      if (LoginEnable) {
-        TuyaUserApi.loginWithPhonePassword({
-          phoneNumber: this.state.useName,
-          password: this.state.password,
-          countryCode: this.state.cityCode,
-        })
-          .then(() => {
-            DeviceStorage.saveUserInfo(this.state.useName, this.state.password, this.state.cityCode).then(() => {
-              this.props.navigation.dispatch(resetAction('HomePage'))
-            })
-          })
-          .catch((error) => {
-            this.toast.show(error.toString().slice(7))
-          })
-      } else {
-        this.toast.show('密码格式有误')
-      }
-    }
-  }
-
-  /* eslint-disable global-require */
   renderLeftButton() {
     return (
       <View>
         <TouchableOpacity
           onPress={() => {
-            this.props.navigation.pop()
+            this.props.navigation.pop();
           }}
           style={{ padding: 5, marginLeft: 8 }}
         >
           <Image source={require('../../res/images/arrow_left.png')} style={{ width: 15, height: 20 }} />
         </TouchableOpacity>
       </View>
-    )
+    );
+  }
+
+  _loginConfirm() {
+    if (this.state.useName.indexOf('@') >= 0) {
+      TuyaUserApi.loginWithEmail({
+        email: `${this.state.useName}`,
+        password: this.state.password,
+        countryCode: this.state.cityCode,
+      })
+        .then((data) => {
+          DeviceStorage.saveUserInfo(`${this.state.useName}`, this.state.password, `${this.state.cityCode}`).then(
+            () => {
+              this.props.navigation.dispatch(resetAction('HomePage'));
+            },
+          );
+        })
+        .catch((error) => {
+          this.refs.toast.show(error.toString().slice(7));
+        });
+    } else {
+      const LoginEnable = CheckUtils.isPoneAvailable(this.state.useName) && CheckUtils.isPassWord(this.state.password);
+      if (LoginEnable) {
+        TuyaUserApi.loginWithPhonePassword({
+          phoneNumber: this.state.useName,
+          password: this.state.password,
+          countryCode: this.state.cityCode,
+        })
+          .then((data) => {
+            DeviceStorage.saveUserInfo(this.state.useName, this.state.password, this.state.cityCode).then(() => {
+              this.props.navigation.dispatch(resetAction('HomePage'));
+            });
+          })
+          .catch((error) => {
+            this.refs.toast.show(error.toString().slice(7));
+          });
+      } else {
+        this.refs.toast.show('密码格式有误');
+      }
+    }
   }
 
   render() {
-    const disabled = !(this.state.useName.length > 5 && this.state.password.length > 5)
+    const disabled = !(this.state.useName.length > 5 && this.state.password.length > 5);
     return (
       <View style={styles.container}>
         <NavigationBar style={{ backgroundColor: '#FFFFFF' }} leftButton={this.renderLeftButton()} />
@@ -119,7 +121,7 @@ export default class LoginPage extends Component {
           onChangeText={(value) => {
             this.setState({
               useName: value,
-            })
+            });
           }}
           placeholder={Strings.phoneNumberOrEmaill}
           placeholderTextColor="#C3C3C9"
@@ -131,7 +133,7 @@ export default class LoginPage extends Component {
           onChangeText={(value) => {
             this.setState({
               password: value,
-            })
+            });
           }}
           placeholder={Strings.Password}
           placeholderTextColor="#C3C3C9"
@@ -142,15 +144,13 @@ export default class LoginPage extends Component {
         <TextButton
           style={{ marginTop: 50 }}
           onPress={() => {
-            this.loginConfirm()
+            this._loginConfirm();
           }}
           disabled={disabled}
           title="登陆"
         />
         <Toast
-          ref={(toast) => {
-            this.toast = toast
-          }}
+          ref="toast"
           style={{ backgroundColor: '#7DB428' }}
           position="top"
           positionValue={200}
@@ -160,7 +160,7 @@ export default class LoginPage extends Component {
           textStyle={{ color: 'white' }}
         />
       </View>
-    )
+    );
   }
 }
 
@@ -197,4 +197,4 @@ const styles = StyleSheet.create({
     marginLeft: 30,
     paddingLeft: 17,
   },
-})
+});

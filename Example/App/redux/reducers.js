@@ -1,8 +1,8 @@
-const HOME_ID = 'home_id'
+const HOME_ID = 'home_id';
 
 const initState = {
   home_id: '',
-}
+};
 
 export default function HomeIDStore(state = initState, action = []) {
   switch (action.type) {
@@ -10,9 +10,9 @@ export default function HomeIDStore(state = initState, action = []) {
       return {
         ...state,
         homeId: action.homeId,
-      }
+      };
 
     default:
-      return state
+      return state;
   }
 }

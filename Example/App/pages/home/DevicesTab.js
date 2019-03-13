@@ -1,57 +1,67 @@
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, Image, Dimensions, FlatList, RefreshControl, TouchableOpacity } from 'react-native'
+import React, { Component } from 'react';
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  ImageBackground,
+  Dimensions,
+  FlatList,
+  RefreshControl,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
+import TuyaHomeApi from '../../api/TuyaHomeApi';
+import TuyaHomeDataManagerApi from '../../api/TuyaHomeDataManagerApi';
 
-import { TuyaHomeApi, TuyaHomeDataManagerApi } from 'tuyasmart-home-sdk'
-// import ButtonX from '../../standard/components/buttonX';
-
-const { width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window');
 
 export default class DevicesTab extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       deviceList: [],
-      // groupList: [],
-      // meshList: [],
-      // sharedDeviceList: [],
-      // sharedGroupList: [],
-    }
-  }
-
-  componentDidMount() {
-    this.loadData()
+      groupList: [],
+      meshList: [],
+      sharedDeviceList: [],
+      sharedGroupList: [],
+    };
   }
 
   loadData() {
     if (this.props.isRoom) {
-      console.log('----true')
+      console.log('----true');
       TuyaHomeDataManagerApi.getRoomDeviceList({
         roomId: this.props.id,
       })
-        .then((data) => {
-          console.log('---data', data)
-        })
+        .then((data) => {})
         .catch((err) => {
-          console.log('-err', err)
-        })
+          console.log('-err', err);
+        });
     } else {
       TuyaHomeApi.getHomeDetail({
         homeId: this.props.id,
       })
         .then((data) => {
+          console.log('------>getHomeDetail', data),
           this.setState({
             deviceList: data.deviceList,
-            // groupList: data.groupList,
-            // meshList: data.meshList,
-            // sharedDeviceList: data.sharedDeviceList,
-            // sharedGroupList: data.sharedGroupList,
-          })
+            groupList: data.groupList,
+            meshList: data.meshList,
+            sharedDeviceList: data.sharedDeviceList,
+            sharedGroupList: data.sharedGroupList,
+          });
         })
-        .catch(() => {})
+        .catch((err) => {});
     }
   }
 
-  /* eslint-disable global-require */
+  componentDidMount() {
+    this.loadData();
+  }
+
   _renderEmpty() {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -71,13 +81,13 @@ export default class DevicesTab extends Component {
           onPress={() => {
             this.props.navigation.navigate('ConfigPage', {
               homeId: this.props.id,
-            })
+            });
           }}
         >
           <Text style={{ fontSize: 13, color: '#A2A3AA' }}>添加设备</Text>
         </TouchableOpacity>
       </View>
-    )
+    );
   }
 
   render() {
@@ -86,17 +96,19 @@ export default class DevicesTab extends Component {
         <FlatList
           data={this.state.deviceList}
           ref={(ref) => {
-            this._flatListRef = ref
+            this._flatListRef = ref;
           }}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => {
-                console.log('--devInfo', item)
+                console.log('--devInfo', item);
+
                 this.props.navigation.navigate('DeviceDetailPage', {
                   devId: item.devId,
                   devInfo: item,
-                  schema: JSON.parse(item.productBean.schemaInfo.schema),
-                })
+                  schema:
+                      Platform.OS === 'ios' ? JSON.parse(item.schema) : JSON.parse(item.productBean.schemaInfo.schema),
+                });
               }}
             >
               <View
@@ -118,7 +130,7 @@ export default class DevicesTab extends Component {
           )}
           style={{ flex: 1 }}
           ListEmptyComponent={this._renderEmpty(this.props)}
-          refreshControl={
+          refreshControl={(
             <RefreshControl
               refreshing={this.state.isRefreshing}
               onRefresh={() => {}}
@@ -128,10 +140,10 @@ export default class DevicesTab extends Component {
               colors={['#ff0000', '#00ff00', '#0000ff']}
               progressBackgroundColor="#ffff00"
             />
-          }
+)}
         />
       </View>
-    )
+    );
   }
 }
 
@@ -144,4 +156,4 @@ const styles = StyleSheet.create({
   tips: {
     fontSize: 29,
   },
-})
+});

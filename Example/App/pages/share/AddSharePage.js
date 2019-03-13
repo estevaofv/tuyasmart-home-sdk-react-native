@@ -1,36 +1,46 @@
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, Image, Dimensions, TouchableOpacity, TextInput } from 'react-native'
-// import { connect } from 'react-redux';
-import { TuyaShareApi } from 'tuyasmart-home-sdk'
-import Toast from 'react-native-easy-toast'
-import NavigationBar from '../../common/NavigationBar'
-// import ButtonX from '../../standard/components/buttonX';
-import ViewUtils from '../../utils/ViewUtils'
+import React, { Component } from 'react';
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  ImageBackground,
+  Dimensions,
+  FlatList,
+  TouchableOpacity,
+  TextInput,
+} from 'react-native';
+import { connect } from 'react-redux';
+import Toast, { DURATION } from 'react-native-easy-toast';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
+import ViewUtils from '../../utils/ViewUtils';
+import TuyaShareApi from '../../api/TuyaShareApi';
 
-const { width } = Dimensions.get('window')
-/* eslint-disable global-require */
+const { height, width } = Dimensions.get('window');
+
 const Res = {
   arrowRight: require('../../res/images/Arrow_right.png'),
-}
+};
 
 export default class AddSharePage extends Component {
   constructor(props) {
-    super(props)
-    const params = this.props.navigation.state.params
-    const devIdList = []
-    console.log('--->params', params.devId)
-    devIdList.push(params.devId)
+    super(props);
+    const params = this.props.navigation.state.params;
+    const devIdList = new Array();
+    console.log('--->params', params.devId);
+    devIdList.push(params.devId);
     this.state = {
       homeId: params.homeId,
-      // shareList: [],
+      shareList: [],
       userName: '',
       devIds: devIdList,
-    }
+    };
   }
 
   componentDidMount() {}
 
-  renderRightBtn(name) {
+  _renderRightBtn(name) {
     return (
       <TouchableOpacity
         onPress={() => {
@@ -42,13 +52,13 @@ export default class AddSharePage extends Component {
               devIds: this.state.devIds,
             })
               .then((data) => {
-                console.log('-->data', data)
-                this.toast.show('添加成功了')
-                this.props.navigation.pop()
+                console.log('-->data', data);
+                this.refs.toast.show('添加成功了');
+                this.props.navigation.pop();
               })
               .catch((err) => {
-                console.log('--->Err', err)
-              })
+                console.log('--->Err', err);
+              });
           }
         }}
       >
@@ -63,7 +73,7 @@ export default class AddSharePage extends Component {
           {name}
         </Text>
       </TouchableOpacity>
-    )
+    );
   }
 
   render() {
@@ -72,16 +82,16 @@ export default class AddSharePage extends Component {
         <NavigationBar
           style={{ backgroundColor: '#FFFFFF', width }}
           leftButton={ViewUtils.getLeftButton(() => {
-            this.props.navigation.pop()
+            this.props.navigation.pop();
           })}
-          rightButton={this.renderRightBtn('完成', this.props)}
+          rightButton={this._renderRightBtn('完成', this.props)}
           title="添加共享"
         />
 
         <TouchableOpacity
           style={[styles.itemStyle]}
           onPress={() => {
-            // this.setState({ editVisible: true });
+            this.setState({ editVisible: true });
           }}
         >
           <Text style={{ color: 'black', fontSize: 16 }}>国家/地区</Text>
@@ -103,18 +113,17 @@ export default class AddSharePage extends Component {
             onChangeText={(value) => {
               this.setState({
                 userName: value,
-              })
+              });
             }}
             placeholder="输入被分享账户"
             placeholderTextColor="#C3C3C9"
+            style={styles.textInputStyle}
             multiline={false}
             underlineColorAndroid="transparent"
           />
         </View>
         <Toast
-          ref={(toast) => {
-            this.toast = toast
-          }}
+          ref="toast"
           position="bottom"
           positionValue={200}
           fadeInDuration={750}
@@ -123,7 +132,7 @@ export default class AddSharePage extends Component {
           textStyle={{ color: 'white' }}
         />
       </View>
-    )
+    );
   }
 }
 
@@ -131,6 +140,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
+    backgroundColor: 'transparent',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     backgroundColor: '#F8F8F8',
@@ -158,4 +168,4 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
   },
-})
+});

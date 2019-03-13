@@ -1,21 +1,32 @@
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, Image, Dimensions, TouchableOpacity } from 'react-native'
-import { TuyaDeviceApi } from 'tuyasmart-home-sdk'
-import { connect } from 'react-redux'
-import NavigationBar from '../common/NavigationBar'
-import ViewUtils from '../utils/ViewUtils'
-import EditDialog from '../component/EditDialog'
+import React, { Component } from 'react';
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  ImageBackground,
+  Dimensions,
+  FlatList,
+  Switch,
+  TouchableOpacity,
+} from 'react-native';
+import { connect } from 'react-redux';
+import NavigationBar from '../common/NavigationBar';
+import ViewUtils from '../utils/ViewUtils';
+import TuyaDeviceApi from '../api/TuyaDeviceApi';
+import { resetAction } from '../navigations/AppNavigator';
+import EditDialog from '../component/EditDialog';
 
-const { width } = Dimensions.get('window')
-/* eslint-disable global-require */
+const { height, width } = Dimensions.get('window');
+
 const Res = {
   arrowRight: require('../res/images/Arrow_right.png'),
-}
+};
 
 class DeviceSettingPage extends Component {
   constructor(props) {
-    super(props)
-    const params = this.props.navigation.state.params
+    super(props);
+    const params = this.props.navigation.state.params;
 
     this.state = {
       devId: params.devId,
@@ -24,7 +35,7 @@ class DeviceSettingPage extends Component {
       editVisible: false,
       nameValue: '',
       homeId: this.props.reducers.homeId,
-    }
+    };
   }
 
   componentDidMount() {}
@@ -35,7 +46,7 @@ class DeviceSettingPage extends Component {
         <NavigationBar
           style={{ backgroundColor: '#F4F4F5', width }}
           leftButton={ViewUtils.getLeftButton(() => {
-            this.props.navigation.pop()
+            this.props.navigation.pop();
           })}
           title="设备设置"
         />
@@ -43,7 +54,7 @@ class DeviceSettingPage extends Component {
         <TouchableOpacity
           style={styles.itemStyle}
           onPress={() => {
-            this.setState({ editVisible: true })
+            this.setState({ editVisible: true });
           }}
         >
           <Text>设备名称</Text>
@@ -65,7 +76,7 @@ class DeviceSettingPage extends Component {
             this.props.navigation.navigate('SharePage', {
               homeId: this.state.homeId,
               devId: this.state.devId,
-            })
+            });
           }}
         >
           <Text>共享设备</Text>
@@ -78,7 +89,7 @@ class DeviceSettingPage extends Component {
               homeId: this.state.homeId,
               devId: this.state.devId,
               productId: this.state.devInfo.productId,
-            })
+            });
           }}
         >
           <Text>创建群组</Text>
@@ -101,7 +112,7 @@ class DeviceSettingPage extends Component {
           textValue={(value) => {
             this.setState({
               nameValue: value,
-            })
+            });
           }}
           save={() => {
             TuyaDeviceApi.renameDevice({
@@ -109,24 +120,24 @@ class DeviceSettingPage extends Component {
               name: this.state.nameValue,
             })
               .then((data) => {
-                console.log('--->data', data)
+                console.log('--->data', data);
                 this.setState({
                   devName: this.state.nameValue,
                   editVisible: false,
-                })
+                });
               })
               .catch((err) => {
-                console.warn('-->err', err)
-              })
+                console.warn('-->err', err);
+              });
           }}
           cancel={() => {
             this.setState({
               editVisible: false,
-            })
+            });
           }}
         />
       </View>
-    )
+    );
   }
 }
 
@@ -134,6 +145,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
+    backgroundColor: 'transparent',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     backgroundColor: '#F8F8F8',
@@ -166,7 +178,7 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     marginTop: 80,
   },
-})
-export default connect((state) => ({
+});
+export default connect(state => ({
   ...state,
-}))(DeviceSettingPage)
+}))(DeviceSettingPage);

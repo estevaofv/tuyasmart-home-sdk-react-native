@@ -1,64 +1,63 @@
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, Image, Dimensions } from 'react-native'
-import { TuyaUserApi } from 'tuyasmart-home-sdk'
-import { resetAction } from '../../navigations/AppNavigator'
+import React, { Component } from 'react';
+import {
+  View, StyleSheet, Text, Image, ImageBackground, Dimensions,
+} from 'react-native';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
+import { resetAction } from '../../navigations/AppNavigator';
+import TuyaUserApi from '../../api/TuyaUserApi';
+import DeviceStorage from '../../utils/DeviceStorage';
+import TextButton from '../../component/TextButton';
 
-import DeviceStorage from '../../utils/DeviceStorage'
-import TextButton from '../../component/TextButton'
-
-const { width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window');
 
 export default class MyPage extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       user: {
         headPic: '',
       },
-    }
+    };
     TuyaUserApi.getCurrentUser()
       .then((data) => {
-        console.log('----get cr', data)
-        if (data == null || data === undefined) {
+        console.log('----get cr', data);
+        if (data == null || data == undefined) {
           // this.logout()
         } else if (data.username) {
           this.setState({
             user: data,
-          })
+          });
         } else {
           // this.logout()
         }
       })
       .catch((error) => {
-        console.warn('error', error)
         // this.logout()
-      })
+      });
   }
 
   logout() {
     DeviceStorage.delete('userInfo').then((data) => {
-      console.log('-data', data)
       TuyaUserApi.logout()
-        .then((value) => {
-          console.log('logout', value)
-          this.props.navigation.dispatch(resetAction('LoginHomePage'))
+        .then((data) => {
+          console.log('logout', data);
+          this.props.navigation.dispatch(resetAction('LoginHomePage'));
         })
         .catch((e) => {
-          console.log('logout', e)
-          this.props.navigation.dispatch(resetAction('LoginHomePage'))
-        })
-    })
+          console.log('logout', e);
+          this.props.navigation.dispatch(resetAction('LoginHomePage'));
+        });
+    });
   }
 
-  /* eslint-disable global-require */
   render() {
-    const headImage =
-      this.state.user.headPic.length > 0 ? (
-        <Image source={{ uri: `${this.state.user.headPic}` }} />
-      ) : (
-        <Image source={require('../../res/images/headPic.png')} />
-      )
+    const headImage = this.state.user.headPic.length > 0 ? (
+      <Image source={{ uri: `${this.state.user.headPic}` }} />
+    ) : (
+      <Image source={require('../../res/images/headPic.png')} />
+    );
     return (
       <View style={styles.container}>
         <View
@@ -125,6 +124,7 @@ export default class MyPage extends Component {
           <Text>headPic</Text>
           {headImage}
         </View>
+
         <TextButton
           style={{
             backgroundColor: '#FFFFFF',
@@ -134,12 +134,12 @@ export default class MyPage extends Component {
           }}
           title="退出登陆"
           onPress={() => {
-            this.logout()
+            this.logout();
           }}
           textStyle={{ color: '#A2A3AA' }}
         />
       </View>
-    )
+    );
   }
 }
 
@@ -147,6 +147,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
+    backgroundColor: 'transparent',
     justifyContent: 'flex-start',
     alignItems: 'center',
     backgroundColor: '#F8F8F8',
@@ -154,4 +155,4 @@ const styles = StyleSheet.create({
   tips: {
     fontSize: 29,
   },
-})
+});

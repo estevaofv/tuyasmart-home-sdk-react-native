@@ -1,9 +1,10 @@
-/* eslint-disable */
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
-import { StyleSheet, Text, TouchableOpacity, ViewPropTypes, Dimensions } from 'react-native'
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import {
+  Image, View, StyleSheet, Text, TouchableOpacity, ColorPropType, ViewPropTypes, Dimensions,
+} from 'react-native';
 
-const { width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window');
 
 export default class TextButton extends Component {
   static propTypes = {
@@ -15,7 +16,7 @@ export default class TextButton extends Component {
   }
 
   constructor(props) {
-    super(props)
+    super(props);
   }
 
   render() {
@@ -26,7 +27,7 @@ export default class TextButton extends Component {
       >
         <Text style={[{ fontSize: 16, color: '#FFFFFF' }, this.props.textStyle]}>{this.props.title}</Text>
       </TouchableOpacity>
-    )
+    );
   }
 }
 
@@ -51,4 +52,4 @@ const styles = StyleSheet.create({
     marginRight: 30,
     borderRadius: 4,
   },
-})
+});

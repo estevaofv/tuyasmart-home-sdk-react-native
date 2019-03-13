@@ -1,4 +1,3 @@
-/* eslint-disable */
 const strings = {
   back: 'Back',
   newUser: 'New User?',
@@ -107,6 +106,6 @@ const strings = {
   addNewMembers: 'Add new members to use erodpro+™',
   shareTips: 'The following users are sharing the devices that you bind.',
   windows: 'Windows',
-}
+};
 
-export default strings
+export default strings;

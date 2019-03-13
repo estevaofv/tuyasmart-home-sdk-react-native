@@ -1,7 +1,6 @@
-/* eslint-disable */
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
-import { Text } from 'react-native'
+import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import { Text } from 'react-native';
 
 export default class RefText extends Component {
   static propTypes = {
@@ -14,31 +13,31 @@ export default class RefText extends Component {
   }
 
   constructor(props) {
-    super(props)
-    this.setText = this.setText.bind(this)
+    super(props);
+    this.setText = this.setText.bind(this);
 
     this.state = {
       text: props.text ? props.text : props.children,
-    }
+    };
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({ text: nextProps.text ? nextProps.text : nextProps.children })
+    this.setState({ text: nextProps.text ? nextProps.text : nextProps.children });
   }
 
   setNativeProps(nativeProps) {
-    this._root.setNativeProps(nativeProps)
+    this._root.setNativeProps(nativeProps);
   }
 
   setText(text) {
-    this.setState({ text })
+    this.setState({ text });
   }
 
   render() {
     return (
-      <Text ref={(ref) => (this._root = ref)} {...this.props}>
+      <Text ref={ref => (this._root = ref)} {...this.props}>
         {this.state.text}
       </Text>
-    )
+    );
   }
 }

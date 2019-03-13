@@ -1,31 +1,29 @@
-/* eslint-disable */
-import React, { Component } from 'react'
-import { View, StyleSheet, Text, Image, Dimensions, TextInput, Modal } from 'react-native'
-import Toast from 'react-native-easy-toast'
-import { TuyaActivatorApi } from 'tuyasmart-home-sdk'
-import NavigationBar from '../../common/NavigationBar'
-import ButtonX from '../../standard/components/buttonX'
-import ViewUtils from '../../utils/ViewUtils'
+import React, { Component } from 'react';
+import {
+  View, StyleSheet, Text, Image, ImageBackground, Dimensions, TextInput, Modal,
+} from 'react-native';
+import Toast, { DURATION } from 'react-native-easy-toast';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
+import ViewUtils from '../../utils/ViewUtils';
+import TextButton from '../../component/TextButton';
+import Strings from '../../i18n/strings';
+import TuyaActivatorApi from '../../api/TuyaActivatorApi';
+import Ratio from '../../utils/ratio';
+import ProgressView from '../../component/ProgressView';
 
-import TextButton from '../../component/TextButton'
-import Strings from '../../i18n/strings'
-
-import Ratio from '../../utils/ratio'
-import ProgressView from '../../component/ProgressView'
-
-const { height, width } = Dimensions.get('window')
-const tips = [Strings.seartDevice, Strings.registerdevice, Strings.initalizingyourdevice]
-/* eslint-disable global-require */
+const { height, width } = Dimensions.get('window');
+const tips = [Strings.seartDevice, Strings.registerdevice, Strings.initalizingyourdevice];
 const Res = {
   progress: require('../../res/images/progress.png'),
-}
+};
 
 export default class ConfigPage extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
-    console.log('---->this.props', this.props)
-    const params = this.props.navigation.state.params
+    console.log('---->this.props', this.props);
+    const params = this.props.navigation.state.params;
     this.state = {
       mark: false,
       wifipassword: '',
@@ -38,96 +36,7 @@ export default class ConfigPage extends Component {
       state: '',
       dev: '',
       homeId: params.homeId,
-    }
-  }
-
-  connect() {
-    console.warn('----->zzz')
-    const { ssid } = this.state
-    if (ssid) {
-      this.setState({
-        mark: false,
-        connecting: true,
-        time: 0,
-        progresstime: 1000,
-        error: false,
-      })
-      this.stop()
-      this.coundDown()
-      TuyaActivatorApi.initActivator({
-        // 配网
-        homeId: this.state.homeId,
-        ssid: this.state.ssid,
-        password: this.state.wifipassword,
-        time: this.state.maxTime,
-        type: 'TY_EZ',
-      })
-        .then((data) => {
-          // console.log('----->data', data);
-          // console.warn('PEIWANGCGON');
-
-          this.setState({
-            progresstime: 10,
-            state: 'success',
-            dev: data,
-            mark: false,
-            connecting: false,
-            error: false,
-          })
-          this.props.navigation.navigate('scan', {
-            dev: this.state.dev,
-            key: this.props.navigation.state.params.key,
-            func: (devId) => {
-              this.props.navigation.pop()
-              this.props.navigation.state.params.func(devId)
-            },
-          })
-          this.stop()
-        })
-        .catch((error) => {
-          console.log('---config err', error)
-          this.refs.toast.show(error.toString().slice(7))
-          this.setState({
-            progresstime: 10,
-            error: true,
-            state: '',
-            mark: false,
-            connecting: false,
-          })
-        })
-    } else {
-      this.refs.toast.show('please connect wifi')
-    }
-  }
-
-  coundDown() {
-    this.timer = setTimeout(() => {
-      const time = this.state.time + 1
-      if (time > this.state.maxTime) {
-        if (this.state.state == 'success') {
-          this.refs.toast.show('success')
-          // this.props.navigation.navigate("scan", {
-          //   dev: this.state.dev,
-          //   key: this.props.navigation.state.params.key,
-          //   func: devId => {
-          //     this.props.navigation.pop();
-          //     this.props.navigation.state.params.func(devId);
-          //   }
-          // });
-        }
-        return
-      }
-      this.setState({ time })
-      this.coundDown()
-    }, this.state.progresstime)
-  }
-
-  stop() {
-    this.timer && clearTimeout(this.timer)
-    TuyaActivatorApi.stopConfig()
-    this.setState({
-      state: '',
-    })
+    };
   }
 
   renderConnectMark() {
@@ -137,7 +46,7 @@ export default class ConfigPage extends Component {
         transparent
         visible
         onRequestClose={() => {
-          this.setState({ mark: false })
+          this.setState({ mark: false });
         }}
       >
         <View style={styles.marks}>
@@ -147,7 +56,7 @@ export default class ConfigPage extends Component {
               onChangeText={(value) => {
                 this.setState({
                   wifipassword: value,
-                })
+                });
               }}
               placeholder={Strings.wifipassword}
               placeholderTextColor="#C3C3C9"
@@ -164,13 +73,13 @@ export default class ConfigPage extends Component {
             >
               <Text style={{ color: '#919499', fontSize: 14 }}>
                 {'WIFI:'}
-                {this.state.ssid === '' ? Strings.connectWifi : this.state.ssid}
+                {this.state.ssid == '' ? Strings.connectWifi : this.state.ssid}
               </Text>
               <ButtonX
                 text={Strings.Change}
                 textStyle={{ color: '#0072BB', fontSize: 14 }}
                 onPress={() => {
-                  TuyaActivatorApi.openNetworkSettings()
+                  TuyaActivatorApi.openNetworkSettings();
                 }}
               />
             </View>
@@ -208,7 +117,94 @@ export default class ConfigPage extends Component {
           </Text>
         </View>
       </Modal>
-    )
+    );
+  }
+
+  connect() {
+    console.warn('----->zzz');
+    if (this.state.ssid) {
+      this.setState({
+        mark: false,
+        connecting: true,
+        time: 0,
+        progresstime: 1000,
+        error: false,
+      });
+      this.stop();
+      this.coundDown();
+      TuyaActivatorApi.initActivator({
+        // 配网
+        homeId: this.state.homeId,
+        ssid: this.state.ssid,
+        password: this.state.wifipassword,
+        time: this.state.maxTime,
+        type: 'TY_EZ',
+      })
+        .then((data) => {
+          console.log('----->data', data);
+          console.warn('PEIWANGCGON');
+          this.setState({
+            progresstime: 10,
+            state: 'success',
+            dev: data,
+            mark: false,
+            connecting: false,
+            error: false,
+          });
+          this.props.navigation.navigate('scan', {
+            dev: this.state.dev,
+            key: this.props.navigation.state.params.key,
+            func: (devId) => {
+              this.props.navigation.pop();
+              this.props.navigation.state.params.func(devId);
+            },
+          });
+          this.stop();
+        })
+        .catch((error) => {
+          console.log('---config err', error);
+          this.refs.toast.show(error.toString().slice(7));
+          this.setState({
+            progresstime: 10,
+            error: true,
+            state: '',
+            mark: false,
+            connecting: false,
+          });
+        });
+    } else {
+      this.refs.toast.show('please connect wifi');
+    }
+  }
+
+  coundDown() {
+    this.timer = setTimeout(() => {
+      const time = this.state.time + 1;
+      if (time > this.state.maxTime) {
+        if (this.state.state == 'success') {
+          this.refs.toast.show('success');
+          // this.props.navigation.navigate("scan", {
+          //   dev: this.state.dev,
+          //   key: this.props.navigation.state.params.key,
+          //   func: devId => {
+          //     this.props.navigation.pop();
+          //     this.props.navigation.state.params.func(devId);
+          //   }
+          // });
+        }
+        return;
+      }
+      this.setState({ time });
+      this.coundDown();
+    }, this.state.progresstime);
+  }
+
+  stop() {
+    this.timer && clearTimeout(this.timer);
+    TuyaActivatorApi.stopConfig();
+    this.setState({
+      state: '',
+    });
   }
 
   renderConnectIng() {
@@ -218,7 +214,7 @@ export default class ConfigPage extends Component {
         transparent
         visible
         onRequestClose={() => {
-          this.setState({ connecting: false })
+          this.setState({ connecting: false });
         }}
       >
         <View style={styles.marks}>
@@ -253,7 +249,7 @@ export default class ConfigPage extends Component {
             >
               {Strings.tips1}
             </Text>
-            {tips.map((d) => (
+            {tips.map(d => (
               <View key={d} style={styles.progressitem}>
                 <Image source={Res.progress} />
                 <Text
@@ -280,14 +276,61 @@ export default class ConfigPage extends Component {
                 marginBottom: 10,
               }}
               onPress={() => {
-                this.setState({ connecting: false })
-                this.stop()
+                this.setState({ connecting: false });
+                this.stop();
               }}
             />
           </View>
         </View>
       </Modal>
-    )
+    );
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <NavigationBar
+          title="添加设备"
+          style={{ backgroundColor: '#FFFFFF', width }}
+          leftButton={ViewUtils.getLeftButton(() => {
+            this.props.navigation.pop();
+          })}
+        />
+        <Image style={{ width, height: 250 }} source={require('../../res/images/config_bg.png')} />
+        <Text style={{ color: '#4A4A4A', fontSize: 18, marginTop: 30 }}>接通电源，确认指示灯在快闪或听到提示音</Text>
+        <TextButton
+          style={{ marginTop: 150 }}
+          onPress={() => {
+            this.setState({
+              mark: true,
+            });
+            TuyaActivatorApi.getCurrentWifi(
+              (value) => {
+                this.setState({ ssid: value });
+              },
+              () => {
+                this.setState({ ssid: '' });
+              },
+            );
+          }}
+          disabled={false}
+          title="下一步"
+        />
+        {this.state.mark && this.renderConnectMark()}
+        {this.state.connecting && this.renderConnectIng()}
+        {this.state.error && this.renderError()}
+        <Toast
+          ref="toast"
+          style={{ backgroundColor: '#7DB428' }}
+          position="bottom"
+          positionValue={200}
+          fadeInDuration={750}
+          fadeOutDuration={1000}
+          opacity={0.8}
+          textStyle={{ color: 'white' }}
+        />
+      </View>
+    );
   }
 
   renderError() {
@@ -297,7 +340,7 @@ export default class ConfigPage extends Component {
         transparent
         visible
         onRequestClose={() => {
-          this.setState({ error: false })
+          this.setState({ error: false });
         }}
       >
         <View style={styles.marks}>
@@ -369,64 +412,16 @@ export default class ConfigPage extends Component {
                   borderTopWidth: 1,
                   borderTopColor: '#DBDBDB',
                 }}
-                onPress={() =>
-                  this.setState({
-                    error: false,
-                  })
+                onPress={() => this.setState({
+                  error: false,
+                })
                 }
               />
             </View>
           </View>
         </View>
       </Modal>
-    )
-  }
-
-  render() {
-    return (
-      <View style={styles.container}>
-        <NavigationBar
-          title="添加设备"
-          style={{ backgroundColor: '#FFFFFF', width }}
-          leftButton={ViewUtils.getLeftButton(() => {
-            this.props.navigation.pop()
-          })}
-        />
-        <Image style={{ width, height: 250 }} source={require('../../res/images/config_bg.png')} />
-        <Text style={{ color: '#4A4A4A', fontSize: 18, marginTop: 30 }}>接通电源，确认指示灯在快闪或听到提示音</Text>
-        <TextButton
-          style={{ marginTop: 150 }}
-          onPress={() => {
-            this.setState({
-              mark: true,
-            })
-            TuyaActivatorApi.getCurrentWifi(
-              (value) => {
-                this.setState({ ssid: value })
-              },
-              () => {
-                this.setState({ ssid: '' })
-              },
-            )
-          }}
-          disabled={false}
-          title="下一步"
-        />
-        {this.state.mark && this.renderConnectMark()}
-        {this.state.connecting && this.renderConnectIng()}
-        {this.state.error && this.renderError()}
-        <Toast
-          ref="toast"
-          style={{ backgroundColor: '#7DB428' }}
-          position="bottom"
-          positionValue={200}
-          fadeInDuration={750}
-          fadeOutDuration={1000}
-          opacity={0.8}
-          textStyle={{ color: 'white' }}
-        />
-      </View>
-    )
+    );
   }
 }
 
@@ -466,7 +461,7 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     width: Ratio.convertX(275),
-    // marginTop: Ratio.convertY(1),
+    marginTop: Ratio.convertY(1),
     borderColor: '#D3D3D3',
     borderWidth: 2,
     backgroundColor: '#F8F8F8',
@@ -517,4 +512,4 @@ const styles = StyleSheet.create({
     marginTop: Ratio.convertY(2),
     marginBottom: Ratio.convertY(2),
   },
-})
+});

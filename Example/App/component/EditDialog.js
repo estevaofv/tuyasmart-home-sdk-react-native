@@ -1,12 +1,13 @@
-/* eslint-disable */
-import React, { Component } from 'react'
-import { StyleSheet, View, Text, Dimensions, Modal, TextInput } from 'react-native'
-import PropTypes from 'prop-types'
-import ButtonX from '../standard/components/buttonX'
-import CheckUtils from '../utils/CheckUtils'
-import Strings from '../i18n'
+import React, { Component } from 'react';
+import {
+  StyleSheet, View, Text, Dimensions, Modal, TextInput,
+} from 'react-native';
+import PropTypes from 'prop-types';
+import ButtonX from '../standard/components/buttonX';
+import CheckUtils from '../utils/CheckUtils';
+import Strings from '../i18n';
 
-const { height, width } = Dimensions.get('window')
+const { height, width } = Dimensions.get('window');
 
 export default class EditDialog extends Component {
   static propTypes = {
@@ -19,6 +20,7 @@ export default class EditDialog extends Component {
     visible: true,
   }
 
+  /* eslint-disable */
   render() {
     return (
       <Modal

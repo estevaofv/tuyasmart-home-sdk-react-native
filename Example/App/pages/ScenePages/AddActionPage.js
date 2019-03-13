@@ -1,42 +1,54 @@
-import React, { Component } from 'react'
-import { View, Text, Image, Dimensions, TouchableOpacity, FlatList } from 'react-native'
-import { TuyaSceneApi } from 'tuyasmart-home-sdk'
-import { connect } from 'react-redux'
-import NavigationBar from '../../common/NavigationBar'
-import ViewUtils from '../../utils/ViewUtils'
+import React, { Component } from 'react';
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  ImageBackground,
+  Dimensions,
+  TouchableOpacity,
+  Switch,
+  FlatList,
+} from 'react-native';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
+import { resetAction } from '../../navigations/AppNavigator';
+import TuyaUserApi from '../../api/TuyaUserApi';
+import DeviceStorage from '../../utils/DeviceStorage';
+import TextButton from '../../component/TextButton';
+import ViewUtils from '../../utils/ViewUtils';
+import TuyaSceneApi from '../../api/TuyaSceneApi';
 
-const { width } = Dimensions.get('window')
-/* eslint-disable global-require */
+const { height, width } = Dimensions.get('window');
 const Res = {
   scenebg: require('../../res/images/scenebg.png'),
   redAdd: require('../../res/images/red_add.png'),
   plug: require('../../res/images/plug.png'),
-}
-class AddActionPage extends Component {
-  constructor(props) {
-    super(props)
+};
 
-    const params = this.props.navigation.state.params
-    console.log('---Add ActionPAge', this.props.reducers.homeId)
+export default class AddActionPage extends Component {
+  constructor(props) {
+    super(props);
+
+    const params = this.props.navigation.state.params;
     this.state = {
-      // onTop: true,
+      onTop: true,
       DevicesLists: [],
       isFromScene: params.isFromScene,
-      homeId: this.props.reducers.homeId,
-    }
+    };
   }
 
   componentDidMount() {
-    TuyaSceneApi.getConditionDevList({ homeId: this.state.homeId })
+    TuyaSceneApi.getConditionDevList({ homeId: 2040920 })
       .then((data) => {
-        console.log('--->getConditionDevList', data)
+        console.log('--->getConditionDevList', data);
         this.setState({
           DevicesLists: data,
-        })
+        });
       })
       .catch((err) => {
-        console.log('--->err', err)
-      })
+        console.log('--->err', err);
+      });
   }
 
   render() {
@@ -53,7 +65,7 @@ class AddActionPage extends Component {
         <NavigationBar
           style={{ backgroundColor: '#F4F4F5', width }}
           leftButton={ViewUtils.getLeftButton(() => {
-            this.props.navigation.pop()
+            this.props.navigation.pop();
           })}
           title="选择动作"
         />
@@ -85,7 +97,7 @@ class AddActionPage extends Component {
                     devId: item.devId,
                     devName: item.name,
                     isFromScene: this.state.isFromScene,
-                  })
+                  });
                 }}
               >
                 <View
@@ -106,9 +118,6 @@ class AddActionPage extends Component {
           />
         </View>
       </View>
-    )
+    );
   }
 }
-export default connect((state) => ({
-  ...state,
-}))(AddActionPage)

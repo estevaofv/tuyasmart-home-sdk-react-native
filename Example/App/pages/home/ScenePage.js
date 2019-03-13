@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import {
   View,
   StyleSheet,
@@ -10,57 +10,98 @@ import {
   FlatList,
   Switch,
   ScrollView,
+  DeviceEventEmitter,
   Modal,
-} from 'react-native'
-import { connect } from 'react-redux'
-import { TuyaSceneApi } from 'tuyasmart-home-sdk'
-import NavigationBar from '../../common/NavigationBar'
+} from 'react-native';
+import NavigationBar from '../../common/NavigationBar';
+import ButtonX from '../../standard/components/buttonX';
+import TuyaSceneApi from '../../api/TuyaSceneApi';
+import NormalDialog from '../../component/NormalDialog';
 
-const { height, width } = Dimensions.get('window')
-/* eslint-disable global-require */
+const { height, width } = Dimensions.get('window');
 const Res = {
   arrow_down: require('../../res/images/arrow_down.png'),
-}
-class ScenePage extends Component {
+};
+export default class ScenePage extends Component {
   constructor(props) {
-    super(props)
-
-    console.log('---this.props.reducers', this.props.reducers.homeId)
+    super(props);
     this.state = {
       isSceneListShow: false,
       isAutoListShow: false,
       sceneList: [],
       conditionList: [],
-      homeId: this.props.reducers.homeId,
+      homeId: '',
       isDialogShow: false,
       dialogText: '',
       dialogActions: [],
-    }
+    };
   }
 
   componentDidMount() {
-    console.log('--->', this.state.homeId)
+    console.log('--->', this.state.homeId.length);
 
-    TuyaSceneApi.getSceneList({ homeId: this.state.homeId })
+    this.setHomeIdListener = DeviceEventEmitter.addListener('setHomeId', (value) => {
+      console.warn('--->value', value);
+    });
+
+    TuyaSceneApi.getSceneList({ homeId: 2040920 })
       .then((data) => {
-        console.log('-getSceneList--->', data)
-        const SceneList = []
-        const conditionList = []
+        console.log('-getSceneList--->', data);
+        const SceneList = new Array();
+        const conditionList = new Array();
         for (let i = 0, j = data.length; i < j; i++) {
-          if (data[i].conditions !== undefined) {
-            conditionList.push(data[i])
+          if (data[i].conditions != undefined) {
+            conditionList.push(data[i]);
           } else {
-            SceneList.push(data[i])
+            SceneList.push(data[i]);
           }
         }
         this.setState({
           sceneList: SceneList,
           conditionList,
-        })
+        });
       })
       .catch((err) => {
-        console.log('---getSceneList->', err)
-      })
+        console.log('---getSceneList->', err);
+      });
+  }
+
+  componentWillUnmount() {
+    this.setHomeIdListener && this.setHomeIdListener.remove();
+  }
+
+  renderLeftButton(name) {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          this.props.navigation.navigate('DeleteScenePage');
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: 'bold',
+            color: 'black',
+            marginLeft: 15,
+          }}
+        >
+          {name}
+        </Text>
+      </TouchableOpacity>
+    );
+  }
+
+  renderRightButton() {
+    return (
+      <TouchableOpacity
+        style={{ width: 30, height: 25 }}
+        onPress={() => {
+          this.props.navigation.navigate('sceneHomePage');
+        }}
+      >
+        <Image source={require('../../res/images/ic_add.png')} style={{ width: 20, height: 20 }} />
+      </TouchableOpacity>
+    );
   }
 
   _renderConditionItem(data) {
@@ -110,45 +151,7 @@ class ScenePage extends Component {
           </View>
         </ImageBackground>
       </View>
-    )
-  }
-
-  renderLeftButton(name) {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          this.props.navigation.navigate('DeleteScenePage', {
-            homeId: this.state.homeId,
-          })
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 14,
-            fontWeight: 'bold',
-            color: 'black',
-            marginLeft: 15,
-          }}
-        >
-          {name}
-        </Text>
-      </TouchableOpacity>
-    )
-  }
-
-  renderRightButton() {
-    return (
-      <TouchableOpacity
-        style={{ width: 30, height: 25 }}
-        onPress={() => {
-          this.props.navigation.navigate('sceneHomePage', {
-            homeId: this.state.homeId,
-          })
-        }}
-      >
-        <Image source={require('../../res/images/ic_add.png')} style={{ width: 20, height: 20 }} />
-      </TouchableOpacity>
-    )
+    );
   }
 
   render() {
@@ -170,12 +173,12 @@ class ScenePage extends Component {
           >
             <TouchableOpacity
               onPress={() => {
-                console.warn('--->diandiandi')
+                console.warn('--->diandiandi');
                 this.setState({
                   isDialogShow: true,
                   dialogText: item.name,
                   dialogActions: item.actions,
-                })
+                });
               }}
             >
               <View
@@ -206,11 +209,11 @@ class ScenePage extends Component {
                     width: 30,
                   }}
                   onPress={() => {
-                    console.warn('---->Zz')
+                    console.warn('---->Zz');
                     this.props.navigation.navigate('AddScenePage', {
                       item,
                       isEdit: true,
-                    })
+                    });
                   }}
                 >
                   <Text
@@ -220,7 +223,7 @@ class ScenePage extends Component {
                       color: '#FFFFFF',
                     }}
                   >
-                    ...
+                      ...
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -231,7 +234,7 @@ class ScenePage extends Component {
         // horizontal={true}
         numColumns={2}
       />
-    ) : null
+    ) : null;
     const isAutoList = this.state.isAutoListShow ? (
       <FlatList
         data={this.state.conditionList}
@@ -239,7 +242,7 @@ class ScenePage extends Component {
         renderItem={this._renderConditionItem}
         style={{ width }}
       />
-    ) : null
+    ) : null;
 
     return (
       <View style={styles.container}>
@@ -254,7 +257,7 @@ class ScenePage extends Component {
             onPress={() => {
               this.setState({
                 isSceneListShow: !this.state.isSceneListShow,
-              })
+              });
             }}
           >
             <View style={styles.btnStyle}>
@@ -270,7 +273,7 @@ class ScenePage extends Component {
             onPress={() => {
               this.setState({
                 isAutoListShow: !this.state.isAutoListShow,
-              })
+              });
             }}
           >
             <View style={styles.btnStyle}>
@@ -291,7 +294,7 @@ class ScenePage extends Component {
             onRequestClose={() => {
               this.setState({
                 isDialogShow: false,
-              })
+              });
             }}
           >
             <View style={styles.allview}>
@@ -319,26 +322,17 @@ class ScenePage extends Component {
                   <FlatList
                     data={this.state.dialogActions}
                     renderItem={({ item }) => {
-                      let newArr
-                      // eslint-disable-next-line
+                      let newArr;
                       for (const i in item.actionDisplayNew) {
-                        newArr = item.actionDisplayNew[i]
+                        newArr = item.actionDisplayNew[i];
                       }
                       return (
                         <View style={{ width: 0.8 * width, flexDirection: 'row' }}>
                           <Text style={{ color: 'black', fontSize: 16 }}>{item.entityName}</Text>
-                          <Text
-                            style={{
-                              color: 'black',
-                              fontSize: 16,
-                              marginLeft: 10,
-                            }}
-                          >
-                            {newArr[0]}
-                          </Text>
+                          <Text style={{ color: 'black', fontSize: 16, marginLeft: 10 }}>{newArr[0]}</Text>
                           <Text style={{ color: 'black', fontSize: 16 }}>{newArr[1]}</Text>
                         </View>
-                      )
+                      );
                     }}
                   />
                 </View>
@@ -357,7 +351,7 @@ class ScenePage extends Component {
                     onPress={() => {
                       this.setState({
                         isDialogShow: false,
-                      })
+                      });
                     }}
                   >
                     <Text style={styles.comfirmText}>确认</Text>
@@ -368,7 +362,7 @@ class ScenePage extends Component {
           </Modal>
         )}
       </View>
-    )
+    );
   }
 }
 
@@ -376,6 +370,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
+    backgroundColor: 'transparent',
     justifyContent: 'flex-start',
     alignItems: 'center',
     backgroundColor: '#F8F8F8',
@@ -456,7 +451,4 @@ const styles = StyleSheet.create({
     paddingTop: 4,
     textAlign: 'center',
   },
-})
-export default connect((state) => ({
-  ...state,
-}))(ScenePage)
+});

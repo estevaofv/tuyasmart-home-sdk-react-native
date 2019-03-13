@@ -2,9 +2,7 @@
 
 ![](https://img.shields.io/github/license/TuyaInc/tuyasmart-home-sdk-react-native.svg)
 
-## Notice 
-
-For now, it's only work on Android.The iOS version is incoming.
+See the demo in https://github.com/TuyaInc/tuyasmart-home-sdk-react-native/tree/master/Example before using.
 
 ## Feature Overview
 
@@ -19,5 +17,3 @@ Tuya Cloud HTTP API interface package
 `$ npm install tuyasmart-home-sdk --save`
 
 `$ react-native link tuyasmart-home-sdk`
-
-
