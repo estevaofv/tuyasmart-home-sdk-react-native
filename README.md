@@ -4,7 +4,9 @@
 
 See the demo in https://github.com/TuyaInc/tuyasmart-home-sdk-react-native/tree/master/Example before using.
 
-[Docs](https://tuyakae.gitbook.io/tuyasmart-home-sdk-react-native)
+## Doc
+
+Refer to Details: [Tuya Smart Doc: tuyasmart-home-sdk-react-native](https://tuyakae.gitbook.io/tuyasmart-home-sdk-react-native)
 
 ## Feature Overview
 
