@@ -2,12 +2,6 @@
 
 ![](https://img.shields.io/github/license/TuyaInc/tuyasmart-home-sdk-react-native.svg)
 
-See the demo in https://github.com/TuyaInc/tuyasmart-home-sdk-react-native/tree/master/Example before using.
-
-## Doc
-
-Refer to Details: [Tuya Smart Doc: tuyasmart-home-sdk-react-native](https://tuyakae.gitbook.io/tuyasmart-home-sdk-react-native)
-
 ## Feature Overview
 
 Tuya Smart APP SDK provides the interface package for the communication with hardware and Tuya Cloud to accelerate the application development process, including the following features:
@@ -21,3 +15,11 @@ Tuya Cloud HTTP API interface package
 `$ npm install tuyasmart-home-sdk --save`
 
 `$ react-native link tuyasmart-home-sdk`
+
+## Examples
+
+See the demo in https://github.com/TuyaInc/tuyasmart-home-sdk-react-native/tree/master/Example before using.
+
+## Doc
+
+Refer to Details: [Tuya Smart Doc: tuyasmart-home-sdk-react-native](https://tuyakae.gitbook.io/tuyasmart-home-sdk-react-native)
